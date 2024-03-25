@@ -1,0 +1,316 @@
+swagger: "2.0"
+info:
+  title: Audition API
+  version: 1.0.0
+tags:
+  - name: auditions
+    description: Operations related to auditions
+security:
+  - bearerAuth: []
+paths:
+  /audition/planning/{id}:
+    get:
+      tags:
+        - auditions
+      summary: Récupérer le planning des auditions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: L'ID de l'audition
+      responses:
+        200:
+          description: Succès
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nom:
+                      type: string
+                    prenom:
+                      type: string
+                    date_audition:
+                      type: string
+                    heure_debut_audition:
+                      type: string
+                    heure_fin_audition:
+                      type: string
+        500:
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              message:
+                type: string
+
+  /audition/genererPlanification:
+    post:
+      tags:
+        - auditions
+      summary: Générer la planification des auditions
+      security:
+        - bearerAuth: []
+      description: Endpoint to create something
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auditionId:
+                  type: string
+                  description: The auditionId field
+      responses:
+        200:
+          description: Succès
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+
+        400:
+          description: Erreur de format de date ou de dépassement de la date spécifiée
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        500:
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+  /audition/genererPlanificationAbcents:
+    post:
+      tags:
+        - auditions
+      summary: Générer la planification des auditions
+      security:
+        - bearerAuth: []
+      description: Endpoint to create something
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auditionId:
+                  type: string
+                  description: The auditionId field
+                dateDebut:
+                  type: string
+                  description: The dateDebut field
+                dateFin:
+                  type: string
+                  description: The dateFin field
+      responses:
+        200:
+          description: Succès
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+
+        400:
+          description: Erreur de format de date ou de dépassement de la date spécifiée
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+        500:
+          description: Erreur serveur
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+  /api/audition/getAudition/{id}:
+    get:
+      summary: Récupérer une audition par ID
+      description: Récupérer les détails d'une audition en spécifiant son ID.
+      tags:
+        - auditions
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID de l'audition.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Succès
+          content:
+            application/json:
+              example:
+                message: "Audition affichée avec succès"
+                audition:
+                  _id: "6584bececdd0488a50d6c0az"
+                  dateDebut: "2023-12-30T23:00:00.000Z"
+                  dateFin: "2023-12-31T23:00:00.000Z"
+                  dureeAudition: 8
+                  heureDebutAudition: 9
+                  heureFinAudition: 17
+                  nombreSeancesParJour: 5
+                  saison:
+                    _id: "6584bececdd0488a50d6c07e"
+                    nom: "Saison1"
+
+        "404":
+          description: Audition non trouvée.
+          content:
+            application/json:
+              example:
+                message: "Audition non trouvée."
+
+        "500":
+          description: Erreur lors de la récupération de l'audition.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la récupération de l'audition."
+  /api/audition/updateAudition/{id}:
+    patch:
+      summary: Mettre à jour une audition par ID
+      description: Mettre à jour les détails d'une audition en spécifiant son ID.
+      tags:
+        - auditions
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID de l'audition à mettre à jour.
+          schema:
+            type: string
+        - in: body
+          name: body
+          required: true
+          description: JSON object contenant les détails à mettre à jour.
+          schema:
+            type: object
+            properties:
+              saison:
+                type: string
+                description: ID de la saison associée.
+              dateDebut:
+                type: string
+                format: date
+                description: Date de début de l'audition.
+              dateFin:
+                type: string
+                format: date
+                description: Date de fin de l'audition.
+              dureeAudition:
+                type: number
+                description: Durée totale de l'audition (en minutes).
+              heureDebutAudition:
+                type: number
+                description: Heure de début quotidienne des auditions (en heures).
+              heureFinAudition:
+                type: number
+                description: Heure de fin quotidienne des auditions (en heures).
+              nombreSeancesParJour:
+                type: number
+                description: Nombre de séances par jour.
+      responses:
+        "201":
+          description: Audition mise à jour avec succès.
+          content:
+            application/json:
+              example:
+                message: "Audition mise à jour avec succès"
+                auditionMiseAJour:
+                  _id: "65aaf2630590c2a076ad5794"
+                  saison: "65aaf2630590c2a076ad5788"
+                  dateDebut: "2024-01-20T12:34:56.789Z"
+                  dateFin: "2024-01-25T12:34:56.789Z"
+                  dureeAudition: 120
+                  heureDebutAudition: 9
+                  heureFinAudition: 17
+                  nombreSeancesParJour: 2
+                  createdAt: "2024-01-20T12:34:56.789Z"
+                  updatedAt: "2024-01-21T14:45:32.123Z"
+        "404":
+          description: Audition non trouvée.
+          content:
+            application/json:
+              example:
+                message: "Audition non trouvée."
+
+        "500":
+          description: Erreur lors de la mise à jour de l'audition.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la mise à jour de l'audition."
+  /api/audition/deleteAudition/{id}:
+    delete:
+      summary: Supprimer une audition par ID
+      description: Supprimer une audition en spécifiant son ID.
+      tags:
+        - auditions
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID de l'audition à supprimer.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Suppression de l'audition effectuée avec succès.
+          content:
+            application/json:
+              example:
+                message: "Suppression de l'audition effectuée avec succès"
+                audition:
+                  _id: "65aaf2630590c2a076ad5794"
+                  saison: "65aaf2630590c2a076ad57zz"
+                  dateDebut: "2024-01-20"
+                  dateFin: "2024-01-25"
+                  dureeAudition: 120
+                  heureDebutAudition: 9
+                  heureFinAudition: 17
+                  nombreSeancesParJour: 2
+                  createdAt: "2024-01-20T12:34:56.789Z"
+                  updatedAt: "2024-01-21T14:45:32.123Z"
+
+        "404":
+          description: Audition non trouvée.
+          content:
+            application/json:
+              example:
+                message: "Audition non trouvée."
+
+        "500":
+          description: Erreur lors de la suppression de l'audition.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la suppression de l'audition."

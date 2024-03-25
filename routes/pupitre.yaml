@@ -1,0 +1,90 @@
+tags:
+  - name: pupitre
+    description: Operations related to pupitre
+security:
+  - bearerAuth: []
+/pupitre/{name}:
+  patch:
+    tags:
+      - pupitre
+    summary: Update needs for a pupitre
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: name
+        required: true
+        schema:
+          type: string
+          enum: [basse, ténor, alto, soprano]
+        description: Name of the pupitre (basse, ténor, alto, soprano)
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              besoin:
+                type: integer
+                description: Number representing the needs
+    responses:
+      "200":
+        description: Successful operation
+      "400":
+        description: Invalid input
+      "404":
+        description: Pupitre not found
+      "500":
+        description: Internal Server Error
+/designerChefs:
+  patch:
+    summary: Designer les chefs d'un pupitre
+    description: Mettre à jour un pupitre avec deux chefs et mettre à jour leurs rôles.
+    tags:
+      - pupitre
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              pupitreId:
+                type: string
+                description: ID du pupitre à mettre à jour.
+              chef1Id:
+                type: string
+                description: ID du premier chef de pupitre.
+              chef2Id:
+                type: string
+                description: ID du deuxième chef de pupitre.
+    responses:
+      "200":
+        description: Pupitre mis à jour avec succès.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: Message de réussite.
+      "404":
+        description: |
+          - Pupitre non trouvé.
+          - Les deux ID d'utilisateurs n'existent pas.
+          - ID d'utilisateur pour chef de pupitre 1 n'existe pas.
+          - ID d'utilisateur pour chef de pupitre 2 n'existe pas.
+      "500":
+        description: Erreur lors de la mise à jour du pupitre ou des rôles des chefs.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                error:
+                  type: string
+                  description: Description de l'erreur.

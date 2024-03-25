@@ -1,0 +1,421 @@
+openapi: 3.0.0
+info:
+  title: Concert API
+  version: 1.0.0
+tags:
+  - name: Concerts
+    description: Endpoints pour gérer les concerts
+paths:
+  /api/concert/addConcert:
+    post:
+      summary: ajouter un nouveau concert
+      security:
+        - bearerAuth: []
+      description: ajouter un nouveau concert avec details et image ou affiche optionnelle.
+      tags:
+        - Concerts
+      parameters:
+        - in: formData
+          name: affiche
+          type: file
+          description: image de l'affiche du concert.
+        - in: header
+          name: Authorization
+          type: text
+          description: JWT token for authentication.
+        - in: formData
+          name: nom
+          type: text
+          description: nom du concert.
+        - in: formData
+          name: date
+          type: text
+          format: date
+          description: la date du concert.
+        - in: formData
+          name: saison
+          type: text
+          description: id (nom) de la saison associée.
+        - in: formData
+          name: heure
+          type: text
+          description: l'heure du concert.
+        - in: formData
+          name: lieu
+          type: text
+          description: la localisation du concert.
+        - in: formData
+          name: previsions
+          type: text
+          description: les prévisions du the concert.
+        - in: formData
+          name: repetitions
+          type: text
+          description: les repetitions du concert.
+        - in: formData
+          name: programme
+          type: text
+          description: le programme du concert (les oeuvres).
+      responses:
+        "201":
+          description: Concert ajouté avec succès.
+        "404":
+          description: |
+            - Saison non trouvée.
+            - Certaines œuvres du programme n'ont pas été trouvées.
+        "500":
+          description: Erreur lors de l'ajout du Concert.
+
+  /api/concert/getConcert/{id}:
+    get:
+      summary: Obtenir les détails d'un concert
+      security:
+        - bearerAuth: []
+      description: Récupérer les détails d'un concert par ID.
+      tags:
+        - Concerts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID du concert à récupérer.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Affichage du concert réussi.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message de réussite.
+                  concert:
+                    type: object
+                    description: Détails du concert.
+                    properties:
+                      _id:
+                        type: string
+                        description: ID du concert.
+                      nom:
+                        type: string
+                        description: Nom du concert.
+                      date:
+                        type: string
+                        format: date
+                        description: Date du concert.
+                      saison:
+                        type: object
+                        description: Saison associée au concert.
+                        properties:
+                          _id:
+                            type: string
+                            description: ID de la saison.
+                          nom:
+                            type: string
+                            description: Nom de la saison.
+                      heure:
+                        type: string
+                        description: Heure du concert.
+                      lieu:
+                        type: string
+                        description: Lieu du concert.
+                      previsions:
+                        type: string
+                        description: Prévisions du concert.
+                      repetitions:
+                        type: string
+                        description: Répétitions du concert.
+
+        "404":
+          description: Concert non trouvé.
+          content:
+            application/json:
+              example:
+                message: "Concert non trouvé."
+        "500":
+          description: Erreur lors de l'affichage du Concert.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de l'affichage du Concert."
+
+  /api/concert/updateConcert/{id}:
+    patch:
+      summary: Mettre à jour un concert
+      security:
+        - bearerAuth: []
+      description: Mettre à jour les détails d'un concert par ID.
+      tags:
+        - Concerts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID du concert à mettre à jour.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                affiche:
+                  type: string
+                  format: binary
+                  description: Image de l'affiche du concert (optionnel).
+                nom:
+                  type: string
+                  description: Nouveau nom du concert.
+                date:
+                  type: string
+                  format: date
+                  description: Nouvelle date du concert.
+                saison:
+                  type: string
+                  description: Nouvelle saison associée au concert.
+                heure:
+                  type: string
+                  description: Nouvelle heure du concert.
+                lieu:
+                  type: string
+                  description: Nouveau lieu du concert.
+                previsions:
+                  type: string
+                  description: Nouvelles prévisions du concert.
+                repetitions:
+                  type: string
+                  description: Nouvelles répétitions du concert.
+      responses:
+        "201":
+          description: Modification du concert réussie.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message de réussite.
+                  concertMAJ:
+                    type: object
+                    description: Détails mis à jour du concert.
+                    properties:
+                      _id:
+                        type: string
+                        description: ID du concert.
+                      nom:
+                        type: string
+                        description: Nom du concert.
+                      date:
+                        type: string
+                        format: date
+                        description: Date du concert.
+                      saison:
+                        type: string
+                        description: Saison associée au concert.
+                      heure:
+                        type: string
+                        description: Heure du concert.
+                      lieu:
+                        type: string
+                        description: Lieu du concert.
+                      previsions:
+                        type: string
+                        description: Prévisions du concert.
+                      repetitions:
+                        type: string
+                        description: Répétitions du concert.
+
+        "404":
+          description: Concert non trouvé.
+          content:
+            application/json:
+              example:
+                message: "Concert non trouvé."
+        "500":
+          description: Erreur lors de la modification du Concert.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la modification du Concert."
+
+  /api/concert/deleteConcert/{id}:
+    delete:
+      summary: Supprimer un concert
+      security:
+        - bearerAuth: []
+      description: Supprimer un concert par ID.
+      tags:
+        - Concerts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID du concert à supprimer.
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Suppression du concert réussie.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message de réussite.
+                  concert:
+                    type: object
+                    description: Détails du concert supprimé.
+                    properties:
+                      _id:
+                        type: string
+                        description: ID du concert.
+                      nom:
+                        type: string
+                        description: Nom du concert.
+                      date:
+                        type: string
+                        format: date
+                        description: Date du concert.
+                      saison:
+                        type: string
+                        description: Saison associée au concert.
+                      heure:
+                        type: string
+                        description: Heure du concert.
+                      lieu:
+                        type: string
+                        description: Lieu du concert.
+                      previsions:
+                        type: string
+                        description: Prévisions du concert.
+                      repetitions:
+                        type: string
+                        description: Répétitions du concert.
+
+        "404":
+          description: Concert non trouvé.
+          content:
+            application/json:
+              example:
+                message: "Concert non trouvé."
+        "500":
+          description: Erreur lors de la suppression du Concert.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la suppression du Concert."
+
+  /api/concert/deleteAll:
+    delete:
+      summary: Supprimer tous les concerts
+      security:
+        - bearerAuth: []
+      description: Supprimer tous les concerts.
+      tags:
+        - Concerts
+      responses:
+        "200":
+          description: Suppression de ${result.deletedCount} concerts effectuée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message de réussite.
+
+        "500":
+          description: Erreur lors de la suppression de tous les concerts.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la suppression de tous les concerts."
+
+  /api/concert/addExcel:
+    post:
+      summary: Ajouter des concerts à partir d'un fichier Excel
+      security:
+        - bearerAuth: []
+      description: Ajouter des concerts à partir d'un fichier Excel en fournissant un fichier Excel avec les détails des concerts.
+      tags:
+        - Concerts
+      parameters:
+        - in: formData
+          name: excelFile
+          type: file
+          description: Fichier Excel contenant les détails des concerts.
+      responses:
+        "201":
+          description: Concerts ajoutés avec succès à partir du fichier Excel.
+          content:
+            application/json:
+              example:
+                message: "Concerts ajoutés avec succès à partir du fichier Excel."
+
+        "400":
+          description: Fichier Excel requis.
+          content:
+            application/json:
+              example:
+                message: "Fichier Excel requis."
+
+        "500":
+          description: Erreur lors de l'ajout des concerts à partir du fichier Excel.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de l'ajout des concerts à partir du fichier Excel."
+/concert/{id}/seuil:
+  patch:
+    tags:
+      - Concerts
+    summary: mettre a jour le seuil d'un concert
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: ID of the concert to update the threshold for
+        schema:
+          type: string
+      - in: body
+        name: body
+        required: true
+        description: JSON object containing the threshold to be updated
+        schema:
+          type: object
+          properties:
+            seuil:
+              type: number
+              description: The new threshold value
+    responses:
+      "200":
+        description: Concert threshold updated successfully
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                concert:
+                  $ref: "#/components/schemas/Concert"
+      "500":
+        description: Internal Server Error
+/concert/statistiqueParConcert:
+  get:
+    summary: "Récupère les statistiques par concert."
+    tags:
+      - statistiques
+    description: "Récupère les statistiques d'absences pour chaque concert."
+    responses:
+      "200":
+        description: Successful response

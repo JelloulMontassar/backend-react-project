@@ -1,0 +1,52 @@
+openapi: 3.0.0
+info:
+  title: Congé API
+  version: 1.0.0
+tags:
+  - name: Congés
+    description: Endpoints pour gérer les congés
+paths:
+  /api/conge/validerconge/{id}:
+    post:
+      summary: Valider un congé
+      description: Valider un congé en spécifiant l'identifiant du congé.
+      tags:
+        - Congés
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID du congé à valider.
+          schema:
+            type: string
+        - in: header
+          name: Authorization
+          type: text
+          description: JWT token for authentication.
+      responses:
+        "201":
+          description: Congé validé avec succès.
+          content:
+            application/json:
+              example:
+                message: "Congé validé avec succès"
+                conge:
+                  _id: "65aad0ec0590c2a076ad5777"
+                  dateDebut: "2024-01-18T23:00:00.000Z"
+                  dateFin: "2024-02-19T23:00:00.000Z"
+                  createdBy: "6584bececdd0488a50d6c07e"
+                  valide: true
+
+        "404":
+          description: Congé non trouvé.
+          content:
+            application/json:
+              example:
+                message: "Congé non trouvé"
+
+        "500":
+          description: Erreur lors de la validation du congé.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la validation du congé"

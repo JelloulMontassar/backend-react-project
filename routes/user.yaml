@@ -1,0 +1,791 @@
+tags:
+  - name: users
+    description: Operations related to users
+security:
+  - bearerAuth: []
+/user:
+  get:
+    tags:
+      - users
+    summary: Get all users
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Successful response
+
+/user/{id}:
+  get:
+    tags:
+      - users
+    summary: Get a user by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        type: string
+    responses:
+      "200":
+        description: Successful response
+      "404":
+        description: User not found
+
+  patch:
+    tags:
+      - users
+    summary: Update a user by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        type: string
+    requestBody:
+      description: Updated user data
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/definitions/UserInput"
+    responses:
+      "200":
+        description: User updated successfully
+      "400":
+        description: Bad request
+      "404":
+        description: User not found
+
+  delete:
+    tags:
+      - users
+    summary: Delete a user by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        type: string
+    responses:
+      "200":
+        description: User deleted successfully
+      "404":
+        description: User not found
+
+/user/updateStatus/{id}:
+  patch:
+    tags:
+      - users
+    summary: Update user status by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: User ID
+        required: true
+        type: string
+    requestBody:
+      description: Updated user status data
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/definitions/UserStatusInput"
+    responses:
+      "200":
+        description: User status updated successfully
+      "400":
+        description: Bad request
+      "404":
+        description: User not found
+
+definitions:
+  UserInput:
+    type: object
+    properties:
+      nom:
+        type: string
+      prenom:
+        type: string
+      telephone:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      status:
+        type: string
+        enum:
+          - inactif
+          - actif
+      niveauExperience:
+        type: string
+        enum:
+          - junior
+          - senior
+          - veteran
+      id_national:
+        type: string
+      nationalite:
+        type: string
+      date_de_naissance:
+        type: string
+        format: date
+      situation_professionnelle:
+        type: string
+      taille:
+        type: number
+      sexe:
+        type: string
+        enum:
+          - femme
+          - homme
+      role:
+        type: string
+        enum:
+          - choriste
+          - chef de pupitre
+          - chef de choeur
+          - manager
+          - admin
+      date_debut_conge:
+        type: string
+        format: date
+      duree_conge:
+        type: number
+
+  UserStatusInput:
+    type: object
+    properties:
+      status:
+        type: string
+        enum:
+          - inactif
+          - actif
+
+/indiquerDisponibilite/{id}:
+  patch:
+    tags:
+      - Choriste
+    summary: Indiquer la disponibilité d'un choriste pour un concert
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: ID du concert
+        required: true
+        type: string
+      - name: body
+        in: body
+        description: Demande pour indiquer la disponibilité
+        required: true
+        schema:
+          type: object
+          properties:
+            disponibilite:
+              type: boolean
+    responses:
+      "200":
+        description: Utilisateur a confirmé sa présence ou son absence au concert
+      "404":
+        description: User non concerné par le concert
+
+/consulterListesChoristesDisponibles/{id}:
+  get:
+    tags:
+      - Choriste
+    summary: Consulter la liste des choristes disponibles pour un concert
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: id
+        in: path
+        description: ID du concert
+        required: true
+        type: string
+      - name: pupitre
+        in: query
+        description: Filtre par pupitre
+        required: false
+        type: string
+    responses:
+      "200":
+        description: Liste des choristes disponibles
+      "404":
+        description: Concert non trouvé
+
+/indiquerPresenceManuelleRep:
+  patch:
+    tags:
+      - Choriste
+    summary: Indiquer la présence manuelle à une répétition
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        description: Demande pour indiquer la présence manuelle
+        required: true
+        schema:
+          type: object
+          properties:
+            userId:
+              type: string
+            repetitionId:
+              type: string
+            raison:
+              type: string
+    responses:
+      "200":
+        description: Présence à la répétition ajoutée avec succès
+      "404":
+        description: Choriste ou répétition non trouvés
+
+/indiquerPresenceManuelleCon:
+  patch:
+    tags:
+      - Choriste
+    summary: Indiquer la présence manuelle à un concert
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        description: Demande pour indiquer la présence manuelle
+        required: true
+        schema:
+          type: object
+          properties:
+            userId:
+              type: string
+            concertId:
+              type: string
+            raison:
+              type: string
+    responses:
+      "200":
+        description: Présence au concert ajoutée avec succès
+      "404":
+        description: Choriste ou concert non trouvés
+
+/presenceConcert:
+  patch:
+    tags:
+      - Choriste
+    summary: Indiquer la présence à un concert via un QR code
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        description: Demande pour indiquer la présence via un QR code
+        required: true
+        schema:
+          type: object
+          properties:
+            code:
+              type: string
+    responses:
+      "200":
+        description: Utilisateur présent
+      "404":
+        description: Qr code invalide ou utilisateur non concerné par le concert
+
+/presenceRepetition:
+  patch:
+    tags:
+      - Choriste
+    summary: Indiquer la présence à une répétition via un QR code
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: body
+        in: body
+        description: Demande pour indiquer la présence via un QR code
+        required: true
+        schema:
+          type: object
+          properties:
+            code:
+              type: string
+    responses:
+      "200":
+        description: Utilisateur présent
+      "404":
+        description: Qr code invalide ou utilisateur non concerné par la répétition
+/user/ActivityHistory:
+  get:
+    tags:
+      - Choriste
+    summary: Get user activity history
+    security:
+      - bearerAuth: []
+    description: |
+      Retrieves the activity history for the authenticated user.
+    parameters:
+      - name: saison
+        in: query
+        description: Filter by season ID
+        type: string
+      - name: oeuvre
+        in: query
+        description: Filter by oeuvre ID
+        type: string
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserActivityHistoryResponse"
+
+/user/getAllUserActivityHistory:
+  get:
+    tags:
+      - Choriste
+    summary: Get activity history for all users
+    security:
+      - bearerAuth: []
+    description: |
+      Retrieves the activity history for all users or a specific user if `id` parameter is provided.
+    parameters:
+      - name: id
+        in: query
+        description: User ID to filter the results (optional)
+        type: string
+      - name: saison
+        in: query
+        description: Filter by season ID
+        type: string
+      - name: oeuvre
+        in: query
+        description: Filter by oeuvre ID
+        type: string
+    responses:
+      "200":
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AllUserActivityHistoryResponse"
+
+components:
+  schemas:
+    UserActivityHistoryResponse:
+      type: object
+      properties:
+        activityHistory:
+          type: object
+          properties:
+            totalRepetitions:
+              type: integer
+            totalConcerts:
+              type: integer
+            repetitionsHistory:
+              type: array
+              items:
+                $ref: "#/components/schemas/RepetitionHistory"
+            concerts:
+              type: array
+              items:
+                $ref: "#/components/schemas/ConcertDetails"
+
+    AllUserActivityHistoryResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        totalRepetitions:
+          type: integer
+        totalConcerts:
+          type: integer
+        repetitionsHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/RepetitionHistory"
+        concerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConcertDetails"
+
+    RepetitionHistory:
+      type: object
+      properties:
+        date:
+          type: string
+        lieu:
+          type: string
+
+    ConcertDetails:
+      type: object
+      properties:
+        nom:
+          type: string
+        date:
+          type: string
+        lieu:
+          type: string
+        saison:
+          type: string
+        oueuvres:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+
+/user/getListeAbsenceRepetitions:
+  get:
+    tags:
+      - users
+    summary: Obtenir la liste des absences aux répétitions
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: saison
+        in: query
+        description: Filtre par ID de saison
+        schema:
+          type: string
+      - name: date
+        in: query
+        description: Filtre par date au format "jj/mm/aaaa"
+        schema:
+          type: string
+      - name: id
+        in: query
+        description: Filtre par ID d'utilisateur
+        schema:
+          type: string
+      - name: pupitre
+        in: query
+        description: Filtre par type de pupitre
+        schema:
+          type: string
+      - name: oeuvre
+        in: query
+        description: Filtre par ID d'œuvre
+        schema:
+          type: string
+
+    responses:
+      "200":
+        description: Succès de la requête
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                absencesRepetitions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      Id_repetition:
+                        type: string
+                      dateRepetition:
+                        type: string
+                      lieu:
+                        type: string
+                      concert:
+                        type: object
+                        properties:
+                          nom:
+                            type: string
+                          saison:
+                            type: string
+                          programmeOeuvres:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                nom:
+                                  type: string
+                                compositeur:
+                                  type: string
+                      countAbsences:
+                        type: integer
+                      absences:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            userId:
+                              type: string
+                            nom:
+                              type: string
+                            prenom:
+                              type: string
+                            raison:
+                              type: string
+                            pupitre:
+                              type: string
+/user/statistiqueParChoriste:
+  get:
+    tags:
+      - statistiques
+    summary: "Récupère les statistiques par choriste."
+    security:
+      - bearerAuth: []
+    description: "Récupère les statistiques d'absences pour chaque choriste."
+    responses:
+      "200":
+        description: Successful response
+/consulterStatut/{id}:
+  get:
+    summary: Consulter le statut d'un utilisateur
+    description: Récupérer le statut d'un utilisateur par son ID.
+    tags:
+      - users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: ID de l'utilisateur à consulter le statut.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Statut de l'utilisateur récupéré avec succès.
+        content:
+          application/json:
+            example:
+              userId: "user_id_here"
+              nom: "Nom de l'utilisateur"
+              prenom: "Prénom de l'utilisateur"
+              status: "Statut de l'utilisateur"
+              niveauExperience: "Niveau d'expérience de l'utilisateur"
+      "404":
+        description: Utilisateur non trouvé.
+        content:
+          application/json:
+            example:
+              error: "User not found"
+      "500":
+        description: Erreur lors de la récupération du statut de l'utilisateur.
+        content:
+          application/json:
+            example:
+              error: "Internal Server Error"
+/consulterHistoriqueStatut/{id}:
+  get:
+    summary: Consulter l'historique de statut d'un utilisateur
+    description: Récupérer l'historique de statut d'un utilisateur par son ID.
+    tags:
+      - users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: ID de l'utilisateur à consulter l'historique de statut.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Historique de statut de l'utilisateur récupéré avec succès.
+        content:
+          application/json:
+            example:
+              success: true
+              message: "Historique - Statut de l'utilisateur"
+              data:
+                - dateDebut_année_de_la_saison: 2018
+                  niveauExperience: "Vétéran"
+                - dateDebut_année_de_la_saison: 2019
+                  niveauExperience: "Choriste Junior"
+                - dateDebut_année_de_la_saison: 2020
+                  niveauExperience: "Choriste"
+                - dateDebut_année_de_la_saison: 2021
+                  niveauExperience: "Senior"
+      "201":
+        description: HistoriqueStatut créé avec succès.
+        content:
+          application/json:
+            example:
+              success: true
+              message: "HistoriqueStatut créé avec succès"
+              data:
+                - dateDebut_année_de_la_saison: 2018
+                  niveauExperience: "Vétéran"
+                - dateDebut_année_de_la_saison: 2019
+                  niveauExperience: "Choriste Junior"
+                - dateDebut_année_de_la_saison: 2020
+                  niveauExperience: "Choriste"
+                - dateDebut_année_de_la_saison: 2021
+                  niveauExperience: "Senior"
+      "404":
+        description: Utilisateur non trouvé.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "User not found"
+      "500":
+        description: Erreur lors de la récupération de l'historique de statut de l'utilisateur.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "Internal Server Error"
+              message: "Erreur lors de l'enregistrement de l'historique"
+/consulterProfil/{id}:
+  get:
+    summary: Consulter le profil d'un utilisateur
+    description: Récupérer le profil d'un utilisateur par son ID.
+    tags:
+      - users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: ID de l'utilisateur à consulter le profil.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Profil de l'utilisateur récupéré avec succès.
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                user:
+                  _id: "65aad0ec0590c2a076ad5777"
+                  nom: "ben arbia"
+                  prenom: "ranim"
+                historicalStatus:
+                  - dateDebut_année_de_la_saison: 2018
+                    niveauExperience: "Vétéran"
+                  - dateDebut_année_de_la_saison: 2019
+                    niveauExperience: "Choriste Junior"
+                isEliminated: false
+                isNominated: true
+      "404":
+        description: Utilisateur non trouvé.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "User not found"
+      "500":
+        description: Erreur lors de la récupération du profil de l'utilisateur.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "Internal Server Error"
+              message: "Erreur lors de la récupération du profil de l'utilisateur"
+/listeabsencechoriste/{authUserId}/{choristeId}:
+  get:
+    summary: Obtenir la liste des absences d'un choriste
+    description: Récupérer la liste des absences d'un choriste par son ID.
+    tags:
+      - users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: authUserId
+        required: true
+        description: ID de l'utilisateur authentifié.
+        schema:
+          type: string
+      - in: path
+        name: choristeId
+        required: true
+        description: ID du choriste pour lequel obtenir la liste des absences.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Liste des absences récupérée avec succès.
+        content:
+          application/json:
+            example:
+              choristeId: "choriste_id_here"
+              nombreAbsencesTotal: 5
+              nombreAbsencesConcerts: 3
+              nombreAbsencesRepetitions: 2
+              absencesConcerts:
+                - Id_concert: "6585f64b5e6eaf2afafc0482"
+                - Id_concert: "6585f64b5e6eaf2afafc0481"
+              absencesRepetitions:
+                - Id_repetition: "6585f64b5e6eaf2afafc0411"
+                - Id_repetition: "6585f64b5e6eaf2afafc0422"
+      "404":
+        description: Choriste non trouvé ou le rôle de l'utilisateur n'est pas 'Choriste'.
+        content:
+          application/json:
+            example:
+              message: "Choriste not found or the role of the user is not 'Choriste'"
+      "500":
+        description: Erreur lors de la récupération de la liste des absences du choriste.
+        content:
+          application/json:
+            example:
+              message: "Error fetching absence count for choriste"
+/eliminerChoristeDicipline/{id}:
+  post:
+    summary: Éliminer un choriste pour raisons disciplinaires
+    description: Éliminer un choriste pour des raisons disciplinaires par son ID.
+    tags:
+      - users
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: ID du choriste à éliminer.
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Choriste éliminé avec succès.
+        content:
+          application/json:
+            example:
+              success: true
+              message: "User eliminated successfully"
+      "400":
+        description: Mauvaise demande, le choriste est déjà éliminé ou nommé.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "User already eliminated"
+      "404":
+        description: Choriste non trouvé ou l'utilisateur n'est pas un choriste.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "User not found"
+      "500":
+        description: Erreur lors de l'élimination du choriste.
+        content:
+          application/json:
+            example:
+              success: false
+              error: "Internal Server Error"

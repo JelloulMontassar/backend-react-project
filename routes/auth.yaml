@@ -1,0 +1,86 @@
+tags:
+  - name: authentification
+    description: Operations related to authentification
+/auth/login:
+  post:
+    tags:
+      - authentification
+    summary: Login
+    consumes:
+      - application/json
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                type: string
+    responses:
+      "200":
+        description: Successful login
+      "400":
+        description: Bad Request
+
+/auth/adduser:
+  post:
+    tags:
+      - authentification
+    summary: Register
+    consumes:
+      - application/json
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nom:
+                type: string
+                minLength: 3
+              prenom:
+                type: string
+                minLength: 3
+              telephone:
+                type: string
+                pattern: "^[0-9]{8}$"
+              email:
+                type: string
+                format: email
+              id_national:
+                type: string
+                pattern: "^[0-9]{8}$|^[0-9]{10}$"
+              nationalite:
+                type: string
+                minLength: 3
+              date_de_naissance:
+                type: string
+                format: date
+              situation_professionnelle:
+                type: string
+                minLength: 3
+              taille:
+                type: number
+              sexe:
+                type: string
+                enum:
+                  - homme
+                  - femme
+              role:
+                type: string
+                enum:
+                  - choriste
+                  - chef de pupitre
+                  - chef de choeur
+                  - manager
+                  - admin
+    responses:
+      "200":
+        description: Successful registration
+      "400":
+        description: Bad Request

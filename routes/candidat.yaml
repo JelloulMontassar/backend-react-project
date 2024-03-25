@@ -1,0 +1,269 @@
+openapi: 3.0.0
+info:
+  title: Candidat API
+  version: 1.0.0
+tags:
+  - name: candidat
+    description: Operations related to candidat
+security:
+  - bearerAuth: []
+
+paths:
+  /candidat:
+    get:
+      tags:
+        - candidat
+      summary: Récupérer la liste des candidats
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: sexe
+          schema:
+            type: string
+            enum: ["homme", "femme"]
+          description: Filtre par sexe
+        - in: query
+          name: taillemin
+          schema:
+            type: number
+            minimum: 1
+          description: Filtre par taille minimale
+        - in: query
+          name: taillemax
+          schema:
+            type: number
+            minimum: 1
+          description: Filtre par taille maximale
+        - in: query
+          name: nom
+          schema:
+            type: string
+          description: Filtre par nom
+        - in: query
+          name: prenom
+          schema:
+            type: string
+          description: Filtre par prénom
+        - in: query
+          name: telephone
+          schema:
+            type: string
+          description: Filtre par numéro de téléphone
+        - in: query
+          name: email
+          schema:
+            type: string
+            format: email
+          description: Filtre par adresse e-mail
+        - in: query
+          name: id_national
+          schema:
+            type: string
+          description: Filtre par numéro d'identification national
+        - in: query
+          name: nationalite
+          schema:
+            type: string
+          description: Filtre par nationalité
+        - in: query
+          name: date_de_naissance
+          schema:
+            type: string
+            format: date
+          description: Filtre par date de naissance
+        - in: query
+          name: situation_professionnelle
+          schema:
+            type: string
+          description: Filtre par situation professionnelle
+        - in: query
+          name: page
+          schema:
+            type: number
+            minimum: 1
+          description: Numéro de page pour la pagination
+        - in: query
+          name: limit
+          schema:
+            type: number
+            minimum: 1
+          description: Limite d'éléments par page pour la pagination
+      responses:
+        "200":
+          description: Succès
+          content:
+            application/json:
+              example:
+                success: true
+        "500":
+          description: Erreur serveur
+          content:
+            application/json:
+              example:
+                success: false
+                message: "Erreur serveur"
+
+  /candidat/accepted:
+    get:
+      tags:
+        - candidat
+      summary: Get accepted candidates
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: order
+          in: query
+          description: Evaluation order criteria (1 for ascending, -1 for descending)
+          required: false
+          schema:
+            type: integer
+            enum: [1, -1]
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+
+  /accept/{id}:
+    patch:
+      tags:
+        - candidat
+      summary: Accept a candidat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the candidat to accept
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Candidat accepted successfully
+        "404":
+          description: Candidat not found
+
+  /confirm/{id}:
+    get:
+      tags:
+        - candidat
+      summary: Confirm a candidat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the candidat to confirm
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Candidat confirmed successfully
+        "404":
+          description: Candidat not found
+
+  /reject/{id}:
+    get:
+      tags:
+        - candidat
+      summary: Reject a candidat
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the candidat to reject
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Candidat rejected successfully
+        "404":
+          description: Candidat not found
+  /api/candidat/saisieInfos/{id}:
+    post:
+      summary: Saisie des informations de l'audition du candidat
+      description: Saisie des informations de l'audition d'un candidat par ID.
+      tags:
+        - candidat
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: L'ID du candidat.
+          schema:
+            type: string
+        - in: body
+          name: body
+          required: true
+          description: JSON object contenant les informations de l'audition du candidat.
+          schema:
+            type: object
+            properties:
+              heure_debut_audition:
+                type: string
+                description: Heure de début de l'audition.
+              heure_fin_audition:
+                type: string
+                description: Heure de fin de l'audition.
+              date_audition:
+                type: string
+                format: date
+                description: Date de l'audition.
+              decision:
+                type: string
+                description: Décision de l'audition.
+              confirmation:
+                type: boolean
+                description: Confirmation de l'audition.
+              note:
+                type: number
+                description: Note de l'audition.
+              extrait_chante:
+                type: string
+                description: Extrait chanté par le candidat.
+              tessiture:
+                type: string
+                description: Tessiture du candidat.
+              remarque:
+                type: string
+                description: Remarques sur l'audition.
+              audition:
+                type: string
+                description: ID de l'audition associée.
+      responses:
+        "200":
+          description: Saisie des informations de l'audition du candidat réussie.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message de réussite.
+                  audition:
+                    type: object
+                    description: Détails de l'audition mise à jour.
+                    properties:
+                      _id:
+                        type: string
+                        description: ID de l'audition.
+        "404":
+          description: Candidat non trouvé.
+          content:
+            application/json:
+              example:
+                message: "Candidat non trouvé."
+        "500":
+          description: Erreur lors de la saisie des informations de l'audition du candidat.
+          content:
+            application/json:
+              example:
+                message: "Erreur lors de la saisie des informations de l'audition du candidat."

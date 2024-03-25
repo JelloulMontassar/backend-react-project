@@ -1,0 +1,188 @@
+/oeuvres/statistiqueParOeuvre:
+  get:
+    tags:
+      - statistiques
+    summary: "Récupère les statistiques par oeuvre."
+    security:
+      - bearerAuth: []
+    description: "Récupère les statistiques d'absences pour chaque oeuvre."
+    responses:
+      "200":
+        description: Successful response
+
+tags:
+  - name: oeuvre
+    description: Operations related to oeuvre
+security:
+  - bearerAuth: []
+/oeuvre:
+  post:
+    tags:
+      - oeuvre
+    summary: Create a new oeuvre
+    security:
+      - bearerAuth: []
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OeuvreRequest"
+    responses:
+      "201":
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  $ref: "#/components/schemas/Oeuvre"
+
+  get:
+    tags:
+      - oeuvre
+    summary: Get all oeuvres
+    security:
+      - bearerAuth: []
+    responses:
+      "200":
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Oeuvre"
+
+/oeuvre/{id}:
+  get:
+    tags:
+      - oeuvre
+    summary: Get an oeuvre by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      "200":
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  $ref: "#/components/schemas/Oeuvre"
+
+  patch:
+    tags:
+      - oeuvre
+    summary: Update an oeuvre by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OeuvreRequest"
+    responses:
+      "200":
+        description: Successful operation
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payload:
+                  $ref: "#/components/schemas/Oeuvre"
+
+  delete:
+    tags:
+      - oeuvre
+    summary: Delete an oeuvre by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      "201":
+        description: Successful operation
+
+components:
+  schemas:
+    Oeuvre:
+      type: object
+      properties:
+        id:
+          type: string
+        titre:
+          type: string
+        compositeur:
+          type: string
+        arrangeur:
+          type: string
+        anne:
+          type: string
+          format: date
+        genre:
+          type: string
+        parole:
+          type: string
+        partition:
+          type: string
+        avecChoeur:
+          type: boolean
+        pupitre:
+          type: string
+          description: Pupitre ID
+
+    OeuvreRequest:
+      type: object
+      properties:
+        titre:
+          type: string
+        compositeur:
+          type: string
+        arrangeur:
+          type: string
+        anne:
+          type: string
+          format: date
+        genre:
+          type: string
+        parole:
+          type: string
+        partition:
+          type: string
+        avecChoeur:
+          type: boolean
+        pupitre:
+          type: string
+          description: Pupitre ID
+      required:
+        - titre
+        - compositeur
+        - arrangeur
+        - anne
+        - genre
+        - parole
+        - partition
+        - avecChoeur
+        - pupitre

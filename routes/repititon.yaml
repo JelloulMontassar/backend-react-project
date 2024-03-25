@@ -1,0 +1,157 @@
+tags:
+  - name: repetition
+    description: Operations related to repetition
+security:
+      - bearerAuth: []
+/repetition:
+    post:
+      tags:
+      - repetition
+      summary: Create a new repetition
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepetitionRequest'
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    $ref: '#/components/schemas/Repetition'
+
+    get:
+      tags:
+      - repetition
+      summary: Get all repetitions
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Repetition'
+
+/repetition/{id}:
+    get:
+      tags:
+      - repetition
+      summary: Get a repetition by ID
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    $ref: '#/components/schemas/Repetition'
+
+    patch:
+      tags:
+      - repetition
+      summary: Update a repetition by ID
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        ƒcontent:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepetitionRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    $ref: '#/components/schemas/Repetition'
+
+    delete:
+      tags:
+      - repetition
+      summary: Delete a repetition by ID
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successful operation
+
+components:
+  schemas:
+    Repetition:
+      type: object
+
+    RepetitionRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        lieu:
+          type: string
+        heure_deb:
+          type: string
+          format: date-time
+        heure_fin:
+          type: string
+          format: date-time
+        concert:
+          type: string
+          description: Concert ID
+        pupitres:
+          type: array
+          items:
+            type: object
+            properties:
+              pupitre:
+                type: string
+                description: Pupitre ID
+              pourcentage:
+                type: integer
+                description: Percentage
+                minimum: 0
+                maximum: 100
+      required:
+        - date
+        - lieu
+        - heure_deb
+        - heure_fin
+        - concert
+        - pupitres
