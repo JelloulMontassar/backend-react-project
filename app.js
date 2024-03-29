@@ -20,7 +20,8 @@ const { notifieradmin } = require("./controllers/candidat.js");
 const cron = require("node-cron");
 const { io } = require("./socket.js");
 const { startScheduler } = require("./notifRappel");
-const User = require("./models/user");
+const path = require("path");
+
 
 startScheduler();
 
@@ -115,10 +116,16 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/oeuvres", ouvresRoutes);
 app.use("/api/conge", congeRoutes);
-app.use("/api/", (req, res) => {
-  res.json(
-    `hello world ! ${process.env.PORT} ${process.env.SENDER_EMAIL_ADDRESS} ${process.env.SENDER_EMAIL_PASSWORD} ${process.env.RANDOM_TOKEN_SECRET} ${process.env.EXPIRES_IN} ${process.env.MONGODB_URI} `
-  );
+app.get("/api/uploads/:fileName", (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = path.join(__dirname, "uploads", fileName);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(err.status || 500).send("File not found");
+    }
+  });
 });
 
 module.exports = app;
