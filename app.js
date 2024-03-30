@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const cors = require('cors');
 const mongoose = require("mongoose");
 require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
@@ -23,9 +22,9 @@ const { io } = require("./socket.js");
 const { startScheduler } = require("./notifRappel");
 const path = require("path");
 const cors = require("cors");
+
 app.use(cors());
 startScheduler();
-app.use(cors());
 
 cron.schedule("00 10 * * *", async () => {
   console.log("Cron job started");
