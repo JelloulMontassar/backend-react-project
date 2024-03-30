@@ -15,7 +15,6 @@ const { generateRandomPassword, hashPassword } = require("../utils/passwords");
 
 
 //   const { nom, prenom, email } = req.body;
-
 //   const transporter = nodemailer.createTransport({
 //     service: "gmail",
 //     auth: {
