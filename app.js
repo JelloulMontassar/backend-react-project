@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require('cors');
 const mongoose = require("mongoose");
 require("dotenv").config();
 app.use(express.urlencoded({ extended: true }));
@@ -23,6 +24,7 @@ const { startScheduler } = require("./notifRappel");
 const User = require("./models/user");
 
 startScheduler();
+app.use(cors());
 
 cron.schedule("00 10 * * *", async () => {
   console.log("Cron job started");
@@ -75,6 +77,7 @@ const options = {
   ],
   apis: ["./routes/*.yaml"],
 };
+
 
 const swaggerSpec = swaggerJSDoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

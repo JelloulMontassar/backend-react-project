@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Saison= require("../models/saison")
+const Saison= require("../models/saison");
 const { generateRandomPassword } = require("../utils/passwords");
 require("dotenv").config()
 
@@ -10,13 +10,14 @@ exports.registerUser = async (req, res) => {
     const userData = req.body;
     const password = generateRandomPassword();
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log(password);
+    console.log("password"+password);
     const newUser = new User({
       ...userData,
       password: hashedPassword,
     });
     await newUser.save();
     res.status(201).json({ message: "user created successfully !" , password });
+    console.log("success")
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
