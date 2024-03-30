@@ -126,6 +126,16 @@ app.get("/api/uploads/:fileName", (req, res) => {
       res.status(err.status || 500).send("File not found");
     }
   });
+app.get("/api/uploads/:fileName", (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = path.join(__dirname, "uploads", fileName);
+
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(err.status || 500).send("File not found");
+    }
+  });
 });
 
 module.exports = app;
