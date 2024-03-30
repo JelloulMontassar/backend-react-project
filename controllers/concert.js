@@ -13,35 +13,18 @@ const {
 const addConcert = async (req, res, next) => {
   try {
     // Vérifier si la saison existe
-    const saisonId = await getSaisonIdByNom(req.body.saison);
 
-    // Vérifier si les œuvres dans le programme existent
-    const oeuvreIds = await getOeuvreIdsByTitle(req.body.programme.split(","));
-
-    if (!saisonId) {
-      return res
-        .status(404)
-        .json({ message: "La saison n'a pas été trouvée." });
-    }
-
-    if (
-      !oeuvreIds ||
-      oeuvreIds.length !== req.body.programme.split(",").length
-    ) {
-      return res.status(404).json({
-        message: "Certaines œuvres du programme n'ont pas été trouvées.",
-      });
-    }
+   
     const concert = new Concert({
       nom: req.body.nom,
       date: req.body.date,
       nom: req.body.nom,
-      saison: saisonId,
+      saison: req.body.saison,
       heure: req.body.heure,
       lieu: req.body.lieu,
       previsions: req.body.previsions,
       repetitions: req.body.repetitions,
-      programme: oeuvreIds,
+      programme: req.body.programme,
     });
     if (req.file) {
       concert.affiche = req.file.path;
@@ -74,7 +57,7 @@ const addConcert = async (req, res, next) => {
 
 
     res
-      .status(201)
+      .status(200)
       .json({ message: "L'ajout du Concert est effectué avec succès" });
     console.log(req.file);
   } catch (error) {
@@ -97,6 +80,19 @@ const getConcert = async (req, res, next) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erreur lors de l'affichage du Concert" });
+  }
+};
+const getConcerts = async (req, res, next) => {
+  try {
+
+    const concerts = await Concert.find({}).populate("saison");
+    res.status(200).json({
+      message: "L'affichage des Concerts est effectué avec succès",
+      concerts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur lors de l'affichage des Concerts" });
   }
 };
 const updateConcert = async (req, res, next) => {
@@ -145,9 +141,8 @@ const deleteConcert = async (req, res, next) => {
         { $pull: { "Concerts": { Concert: concertId } } }
       );
     }
-    res.status(201).json({
+    res.status(200).json({
       message: "La suppression du Concert est effectuée avec succès",
-      concert,
     });
   } catch (error) {
     console.error(error);
@@ -427,5 +422,6 @@ module.exports = {
   getOeuvreIdsByTitle,
   getSaisonIdByNom,
   statistiqueParConcert,
-  informerAbsence
+  informerAbsence,
+  getConcerts,
 };

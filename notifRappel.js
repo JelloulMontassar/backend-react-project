@@ -4,7 +4,7 @@ const { io } = require("./socket.js");
 const Notification = require("./models/notification");
 const Users = require("./models/user");
 const socketIoClient = require("socket.io-client");
-const socket_client = socketIoClient("http://localhost:3000");
+const socket_client = socketIoClient("http://localhost:4000");
 const startScheduler = () => {
   cron.schedule("48 14 * * *", async () => {
     try {

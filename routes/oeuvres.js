@@ -11,8 +11,8 @@ router.post(
 );
 router.get(
   "/getoeuvre",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   oeuvresController.getoeuvre
 );
 router.get(

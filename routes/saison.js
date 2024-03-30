@@ -4,7 +4,9 @@ const SaisonController = require("../controllers/saison");
 const authMiddleware=require("../middlewares/auth");
 
 router.post("/createsaison", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.createSaison);
-router.get("/getsaisons", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.getSaison);
+router.get("/getsaisons", 
+// authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
+SaisonController.getSaison);
 router.delete("/deleteSaison/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.deleteSaison);
 router.patch("/updatesaison/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.updateSaison);
 router.get("/getsaisonbyid/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.getSaisonbyId);
