@@ -1,5 +1,5 @@
 const socketIoClient = require("socket.io-client");
-const socket_client = socketIoClient("http://localhost:3000");
+const socket_client = socketIoClient("http://localhost:4000");
 const User = require("./models/user");
 const Repetition = require("./models/repetition");
 const Notification = require("./models/notification");

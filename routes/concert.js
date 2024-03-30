@@ -11,23 +11,29 @@ authMiddleware.isAdmin,ConcertController.statistiqueParConcert);
 
 
 router.post(
-  "/addConcert",
+  "/",
   uploadMiddleware.single("affiche"),
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   ConcertController.addConcert
 );
 router.get(
-  "/getConcert/:id",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  "/",
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
+  ConcertController.getConcerts
+);
+router.get(
+  "/:id",
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   ConcertController.getConcert
 );
 router.patch(
-  "/updateConcert/:id",
+  "/:id",
   uploadMiddleware.single("affiche"),
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   ConcertController.updateConcert
 );
 router.patch(
@@ -36,9 +42,9 @@ router.patch(
   ConcertController.informerAbsence
 );
 router.delete(
-  "/deleteConcert/:id",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  "/:id",
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   ConcertController.deleteConcert
 );
 router.delete(
