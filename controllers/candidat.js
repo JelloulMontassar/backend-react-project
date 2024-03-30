@@ -292,6 +292,40 @@ const acceptCandidat = async (req, res) => {
     });
   }
 };
+const updateCandidat = async (req, res) => {
+  try {
+    const candidatId = req.params.id;
+    const updatedCandidat = await Candidat.findByIdAndUpdate(
+      candidatId,
+      req.body,
+      { new: true }
+    );
+    if (!updatedCandidat) {
+      return res.status(404).json({ message: "Candidat non trouvée" });
+    }
+    await updatedCandidat.save();
+    if (updatedCandidat.decision === "retenu") {
+      mailSender.sendEmail(
+        "subject",
+        updatedCandidat.email,
+        acceptCandidatEmailTemplate(
+          updatedCandidat.nom,
+          updatedCandidat.prenom,
+          updatedCandidat._id
+        )
+      );
+    }
+    res.status(200).json({
+      message: "Candidat mise à jour avec succès",
+      payload: updatedCandidat,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour l'audition" });
+  }
+};
 
 const confirm = async (req, res) => {
   try {
@@ -458,4 +492,5 @@ module.exports = {
   reject,
   notifieradmin,
   postCandidat,
+  updateCandidat
 };

@@ -3,19 +3,10 @@ const Candidat = require("../models/candidat");
 const { envoyerEmail, envoyerEmail2 } = require("../utils/AuditionTimeMail");
 const moment = require("moment");
 
-const getAudition = async (req, res, next) => {
+const getAudition = async (req, res) => {
   try {
-    const auditionId = req.params.id;
-
-    const audition = await Audition.findById(auditionId).populate("saison");
-
-    if (!audition) {
-      return res.status(404).json({ message: "Audition non trouvée" });
-    }
-
-    res
-      .status(201)
-      .json({ message: "Audition affichée avec succès", audition });
+    const auditions = await Audition.find({});
+    res.status(200).json({ message: "Success", payload: auditions });
   } catch (error) {
     console.error(error);
     res
@@ -23,23 +14,21 @@ const getAudition = async (req, res, next) => {
       .json({ message: "Erreur lors de récupération de l'audition" });
   }
 };
-const updateAudition = async (req, res, next) => {
+const updateAudition = async (req, res) => {
   try {
     const auditionId = req.params.id;
-
-    const auditionMiseAJour = await Audition.findByIdAndUpdate(
+    const updatedAudition = await Audition.findByIdAndUpdate(
       auditionId,
       req.body,
       { new: true }
     );
-
-    if (!auditionMiseAJour) {
+    if (!updatedAudition) {
       return res.status(404).json({ message: "Audition non trouvée" });
     }
-
-    res
-      .status(201)
-      .json({ message: "Audition mise à jour avec succès", auditionMiseAJour });
+    res.status(200).json({
+      message: "Audition mise à jour avec succès",
+      payload: updatedAudition,
+    });
   } catch (error) {
     console.error(error);
     res
@@ -47,7 +36,7 @@ const updateAudition = async (req, res, next) => {
       .json({ message: "Erreur lors de la mise à jour l'audition" });
   }
 };
-const deleteAudition = async (req, res, next) => {
+const deleteAudition = async (req, res) => {
   try {
     const auditionId = req.params.id;
 
@@ -55,14 +44,13 @@ const deleteAudition = async (req, res, next) => {
     if (!audition) {
       return res.status(404).json({ message: "Audition non trouvée" });
     }
-    // Update Candidat with deleted Audition
-    await Candidat.updateMany(
-      { audition: auditionId },
-      { $unset: { audition: 1 } }
-    );
+    // await Candidat.updateMany(
+    //   { audition: auditionId },
+    //   { $unset: { audition: 1 } }
+    // );
+
     res.status(201).json({
       message: "Suppression de l'audition est effectuée avec succès",
-      audition,
     });
   } catch (error) {
     console.error(error);
