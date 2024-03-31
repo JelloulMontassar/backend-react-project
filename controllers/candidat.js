@@ -99,6 +99,7 @@ const sentmail = async (req, res) => {
 
   try {
     const existingEmail = await Candidattest.findOne({ email });
+    console.log(existingEmail)
 
         if (existingEmail) {
       console.log("Email déjà existant dans la base de données");
@@ -117,7 +118,7 @@ const sentmail = async (req, res) => {
             console.error(err);
             return res.status(500).send("Error creating token");
           }
-          const confirmation = `http://localhost:3001/confirmation/${token}`;
+          const confirmation = `http://localhost:3000/confirmation/${token}`;
 
           const mailOptions = {
             from: "ghaly4045@gmail.com",
