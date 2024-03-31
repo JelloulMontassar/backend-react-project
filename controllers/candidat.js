@@ -13,54 +13,123 @@ const {
 const { accountEmailTemplate } = require("../utils/accountEmailTemplate");
 const { generateRandomPassword, hashPassword } = require("../utils/passwords");
 
-const sentmail = (req, res) => {
+
+//   const { nom, prenom, email } = req.body;
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: "cyrinemechmech11@gmail.com",
+//       pass: "psaz iedp yyxu fewu",
+//     },
+//     tls: {
+//       rejectUnauthorized: false, // Désactiver la vérification du certificat
+//     },
+//   });
+
+//   try {
+//     const existingEmail = await Candidattest.findOne({ email });
+
+//     if (existingEmail) {
+//       console.log("Email déjà existant dans la base de données");
+//       return res.status(200).json({
+//         message: "Adresse e-mail valide mais existante dans la base de données.",
+//         emailExists: true
+//       });
+//     } else {
+//       // Générer le token JWT uniquement si l'email est nouveau
+//       jwt.sign(
+//         { nom: nom, prenom: prenom, email: email },
+//         process.env.ACCESSTOKENSECRET,
+//         { expiresIn: "365d" },
+//         async (err, token) => {
+//           if (err) {
+//             console.error(err);
+//             return res.status(500).send("Error creating token");
+//           }
+
+//           const confirmation = `http://localhost:5000/api/candidat/confirmation?token=${token}`;
+
+//           const mailOptions = {
+//             from: "cyrinemechmech11@gmail.com",
+//             to: email,
+//             subject: "email de confirmation",
+//             text: `Hello ${nom} ${prenom},\n\n your email is valid, press this link to register <a href="${confirmation}">Confirmer</a>.`,
+//           };
+
+//           transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//               console.error(error);
+//               return res.status(500).send("Error sending email");
+//             }
+//             res.cookie("token", token, {
+//   // const sentmail = async (req, res) => {            path: "/",
+//               maxAge: 24 * 30 * 10,
+//             });
+//             console.log("Email sent: " + info.response);
+//             // Supprimez la ligne ci-dessous qui envoie une réponse après l'envoi du courriel.
+//           });
+
+//           return res.status(200).json({
+//             message: "Adresse e-mail valide et mail sent successfully",
+//           });
+//         }
+//       );
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       message: "Erreur lors de la validation de l'adresse e-mail.",
+//     });
+//   }
+// };
+
+const sentmail = async (req, res) => {
   const { nom, prenom, email } = req.body;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "cyrinemechmech11@gmail.com",
-      pass: "psaz iedp yyxu fewu",
+    user: "ghaly4045@gmail.com", 
+    pass: "fppb rqus basw bxtw",
     },
     tls: {
       rejectUnauthorized: false, // Désactiver la vérification du certificat
     },
   });
 
-  jwt.sign(
-    { nom: nom, prenom: prenom, email: email },
-    process.env.ACCESSTOKENSECRET,
-    { expiresIn: "365d" },
-    async (err, token) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("Error creating token");
-      }
-
-      const confirmation = `http://localhost:5000/api/candidat/confirmation?token=${token}`;
-
-      const mailOptions = {
-        from: "cyrinemechmech11@gmail.com",
-        to: email,
-        subject: "email confirmationnnn",
-        text: `Hello ${nom} ${prenom},\n\n your email is valid, press this link to register ${confirmation}.`,
-      };
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: "Adresse e-mail non valide." });
-      }
-
-      try {
-        const existingEmail = await Candidattest.findOne({ email });
+  try {
+    const existingEmail = await Candidattest.findOne({ email });
+    console.log(existingEmail)
 
         if (existingEmail) {
-          return res.status(200).json({
-            message:
-              "Adresse e-mail valide mais existante dans la base de données.",
-          });
-        } else {
+      console.log("Email déjà existant dans la base de données");
+      return res.status(200).json({
+        message: "Adresse e-mail valide mais existante dans la base de données.",
+        emailExists: true
+      });
+    } else {
+      // Générer le token JWT uniquement si l'email est nouveau
+      jwt.sign(
+        { nom: nom, prenom: prenom, email: email },
+        process.env.ACCESSTOKENSECRET,
+        { expiresIn: "365d" },
+        async (err, token) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send("Error creating token");
+          }
+          const confirmation = `http://localhost:3000/confirmation/${token}`;
+
+          const mailOptions = {
+            from: "ghaly4045@gmail.com",
+            to: email,
+            subject: "email de confirmation",
+            html: `
+              <p>Hello ${nom} ${prenom},</p>
+              <p>Votre email est valide. Cliquez sur le lien suivant pour confirmer votre inscription :</p>
+              <a href="${confirmation}">Confirmation</a>
+            `,          
+          };
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
               console.error(error);
@@ -68,30 +137,73 @@ const sentmail = (req, res) => {
             }
             res.cookie("token", token, {
               path: "/",
-              maxAge: 24 * 30 * 60,
+              maxAge: 24 * 30 * 10,
             });
             console.log("Email sent: " + info.response);
-            // Supprimez la ligne ci-dessous qui envoie une réponse après l'envoi du courriel.
           });
+
           return res.status(200).json({
             message: "Adresse e-mail valide et mail sent successfully",
           });
         }
-      } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-          message: "Erreur lors de la validation de l'adresse e-mail.",
-        });
-      }
-    }
-  );
+      );
+    }}
+   catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Erreur lors de la validation de l'adresse e-mail.",
+    });
+  }
 };
 
-const confirmation = (req, res) => {
+// const confirmation = (req, res) => {
+//   try {
+//     const { token } = req.query;
+//     if (!token) {
+//       return res.status(400).json({ message: "Token not found in cookies." });
+//     }
+//     jwt.verify(
+//       token,
+//       process.env.ACCESSTOKENSECRET,
+//       {},
+//       async (err, decoded) => {
+//         if (err) throw err;
+//         const existingEmail = await Candidattest.findOne({
+//           email: decoded.email,
+//         });
+
+//         if (existingEmail) {
+//           return res.status(200).json({
+//             message:
+//               "Adresse e-mail valide et existante dans la base de données.",
+//           });
+//           //return res.redirect('http//validation/mailexistant');
+//         }
+
+//         const newCandidat = new Candidattest({
+//           nom: decoded.nom,
+//           prenom: decoded.prenom,
+//           email: decoded.email,
+//         });
+
+//         newCandidat.save();
+//         res.status(200).json({
+//           message: "Email confirmed successfully. Nouvel utilisateur créé",
+//         });
+//         //return res.redirect('/validation');
+
+//       }
+//     );
+//   } catch (err) {
+//     return res.status(500).json({ msg: err.message });
+//   }
+// };
+
+const confirmation = async (req, res) => {
   try {
     const { token } = req.query;
     if (!token) {
-      return res.status(400).json({ message: "Token not found in cookies." });
+      return res.status(400).json({ success: false, message: "Token not found in cookies." });
     }
     jwt.verify(
       token,
@@ -105,8 +217,8 @@ const confirmation = (req, res) => {
 
         if (existingEmail) {
           return res.status(200).json({
-            message:
-              "Adresse e-mail valide et existante dans la base de données.",
+            success: true,
+            message: "Adresse e-mail valide et existante dans la base de données.",
           });
         }
 
@@ -116,16 +228,23 @@ const confirmation = (req, res) => {
           email: decoded.email,
         });
 
-        newCandidat.save();
-        res.status(200).json({
-          message: "Email confirmed successfully. Nouvel utilisateur créé",
+        await newCandidat.save();
+        
+        // Au lieu de la redirection, renvoyer un message JSON avec le statut de succès
+        return res.status(200).json({
+          success: true,
+          message: "Email confirmé avec succès.",
         });
       }
     );
   } catch (err) {
-    return res.status(500).json({ msg: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
+
+
+
+
 
 const getCandidats = async (req, res) => {
   try {
@@ -290,6 +409,40 @@ const acceptCandidat = async (req, res) => {
       message: "server error ",
       error: error.message,
     });
+  }
+};
+const updateCandidat = async (req, res) => {
+  try {
+    const candidatId = req.params.id;
+    const updatedCandidat = await Candidat.findByIdAndUpdate(
+      candidatId,
+      req.body,
+      { new: true }
+    );
+    if (!updatedCandidat) {
+      return res.status(404).json({ message: "Candidat non trouvée" });
+    }
+    await updatedCandidat.save();
+    if (updatedCandidat.decision === "retenu") {
+      mailSender.sendEmail(
+        "subject",
+        updatedCandidat.email,
+        acceptCandidatEmailTemplate(
+          updatedCandidat.nom,
+          updatedCandidat.prenom,
+          updatedCandidat._id
+        )
+      );
+    }
+    res.status(200).json({
+      message: "Candidat mise à jour avec succès",
+      payload: updatedCandidat,
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour l'audition" });
   }
 };
 
@@ -458,4 +611,5 @@ module.exports = {
   reject,
   notifieradmin,
   postCandidat,
+  updateCandidat
 };

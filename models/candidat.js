@@ -27,7 +27,7 @@ const candidatSchema = new mongoose.Schema(
     note: {
       type: Number,
       min: 1,
-      max: 9,
+      max: 3,
     },
     extrait_chante: { type: String },
     tessiture: { type: String },
@@ -43,16 +43,10 @@ const candidatSchema = new mongoose.Schema(
 candidatSchema.virtual("evaluation").get(function () {
   const numericValue = this.note;
 
-  const gradeLetters = {
-    9: "A+",
-    8: "A",
-    7: "A-",
-    6: "B+",
-    5: "B",
-    4: "B-",
-    3: "C+",
-    2: "C",
-    1: "C-",
+  const gradeLetters = {   
+    3: "A",
+    2: "B",
+    1: "C",
   };
 
   return gradeLetters[numericValue] || "N/A";

@@ -22,6 +22,7 @@ const { io } = require("./socket.js");
 const { startScheduler } = require("./notifRappel");
 const path = require("path");
 const cors = require("cors");
+
 app.use(cors());
 startScheduler();
 
@@ -76,6 +77,7 @@ const options = {
   ],
   apis: ["./routes/*.yaml"],
 };
+
 
 const swaggerSpec = swaggerJSDoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
