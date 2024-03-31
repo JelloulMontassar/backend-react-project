@@ -14,7 +14,6 @@ const addConcert = async (req, res, next) => {
   try {
     // Vérifier si la saison existe
 
-   
     const concert = new Concert({
       nom: req.body.nom,
       date: req.body.date,
@@ -27,7 +26,7 @@ const addConcert = async (req, res, next) => {
       programme: req.body.programme,
     });
     if (req.file) {
-      concert.affiche = req.file.path;
+      concert.affiche = req.file.filename;
     }
     const concerts = await Concert.find();
 
@@ -45,7 +44,7 @@ const addConcert = async (req, res, next) => {
 
     // save le modele s il passe la validation
     await concert.save();
-  /////////// add concert id dans liste choristes
+    /////////// add concert id dans liste choristes
     const choristes = await User.find({ role: "choriste" });
 
     for (const choriste of choristes) {
@@ -54,11 +53,11 @@ const addConcert = async (req, res, next) => {
       });
       await choriste.save();
     }
-
-
-    res
-      .status(200)
-      .json({ message: "L'ajout du Concert est effectué avec succès" });
+    await concert.populate("saison");
+    res.status(200).json({
+      message: "L'ajout du Concert est effectué avec succès",
+      payload: concert,
+    });
     console.log(req.file);
   } catch (error) {
     console.error(error);
@@ -84,7 +83,6 @@ const getConcert = async (req, res, next) => {
 };
 const getConcerts = async (req, res, next) => {
   try {
-
     const concerts = await Concert.find({}).populate("saison");
     res.status(200).json({
       message: "L'affichage des Concerts est effectué avec succès",
@@ -92,7 +90,9 @@ const getConcerts = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Erreur lors de l'affichage des Concerts" });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de l'affichage des Concerts" });
   }
 };
 const updateConcert = async (req, res, next) => {
@@ -105,20 +105,22 @@ const updateConcert = async (req, res, next) => {
       runValidators: true,
     });
     if (req.file) {
-      concertMAJ.affiche = req.file.path;
+      concertMAJ.affiche = req.file.filename;
     }
     //console.log("Updated Concert:", concertMAJ);
     await concertMAJ.save();
     if (!concertMAJ) {
       return res.status(404).json({ message: "Concert non trouvée" });
     }
+    await concertMAJ.populate("saison");
 
     res.status(201).json({
       message: "La modification du Concert est effectuée avec succès",
-      concertMAJ,
+      payload: concertMAJ,
     });
   } catch (error) {
     console.error(error);
+    
     res
       .status(500)
       .json({ message: "Erreur lors de la modification du Concert" });
@@ -138,7 +140,7 @@ const deleteConcert = async (req, res, next) => {
       // Utiliser $pull pour retirer l'ID du concert de la liste Concerts
       await User.updateOne(
         { _id: choriste._id },
-        { $pull: { "Concerts": { Concert: concertId } } }
+        { $pull: { Concerts: { Concert: concertId } } }
       );
     }
     res.status(200).json({
@@ -157,10 +159,7 @@ const deleteAllConcerts = async (req, res, next) => {
     const choristes = await User.find({ role: "choriste" });
 
     for (const choriste of choristes) {
-      await User.updateOne(
-        { _id: choriste._id },
-        { $set: { Concerts: [] } }
-      );
+      await User.updateOne({ _id: choriste._id }, { $set: { Concerts: [] } });
     }
     res.status(200).json({
       message: `Suppression de ${result.deletedCount} concerts effectuée avec succès`,
@@ -187,14 +186,12 @@ const excelFile = async (req, res, next) => {
           nom: concertData.nom,
           date: concertData.date,
           heure: concertData.heure,
-          saison: await getSaisonIdByNom(concertData.saison),
+          saison: concertData.saison,
           lieu: concertData.lieu,
           affiche: concertData.affiche,
           previsions: concertData.previsions,
           repetitions: concertData.repetitions,
-          programme: await getOeuvreIdsByTitle(
-            concertData.programme.split(",")
-          ),
+          programme: concertData.programme.split(","),
         });
         const concerts = await Concert.find();
 
@@ -206,15 +203,15 @@ const excelFile = async (req, res, next) => {
 
         concert.qrCode.code = codeQR;
         concert.qrCode.image = imageQr;
-         /////////// add concert id dans liste choristes
-    const choristes = await User.find({ role: "choriste" });
+        /////////// add concert id dans liste choristes
+        const choristes = await User.find({ role: "choriste" });
 
-    for (const choriste of choristes) {
-      choriste.Concerts.push({
-        Concert: concert._id,
-      });
-      await choriste.save();
-    }
+        for (const choriste of choristes) {
+          choriste.Concerts.push({
+            Concert: concert._id,
+          });
+          await choriste.save();
+        }
         await concert.save();
       } catch (error) {
         console.error(error.message);

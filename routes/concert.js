@@ -56,8 +56,8 @@ router.delete(
 router.post(
   "/addExcel",
   uploadExcelMiddleware.single("excelFile"),
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   ConcertController.excelFile
 );
 router.patch("/seuilconcert/:id", ConcertController.SaveSeuilconcert);
