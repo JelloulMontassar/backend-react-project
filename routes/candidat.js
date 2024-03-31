@@ -9,9 +9,16 @@ router.post("/", candidatController.postCandidat);
 router.get(
   "/",
   requestValidator.validateQueryParams,
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   candidatController.getCandidats
+);
+
+router.delete(
+  "/:id",
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
+  candidatController.deleteCandidat
 );
 router.post(
   "/saisieInfos/:id",
