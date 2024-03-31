@@ -120,7 +120,7 @@ const updateConcert = async (req, res, next) => {
     });
   } catch (error) {
     console.error(error);
-    
+
     res
       .status(500)
       .json({ message: "Erreur lors de la modification du Concert" });
@@ -180,9 +180,11 @@ const excelFile = async (req, res, next) => {
     const path = req.file.path;
     const programmeData = convertExcelToJson(path);
 
+    let concert; // Déclarer la variable en dehors de la boucle
+
     for (const concertData of programmeData) {
       try {
-        const concert = new Concert({
+        concert = new Concert({
           nom: concertData.nom,
           date: concertData.date,
           heure: concertData.heure,
@@ -220,14 +222,18 @@ const excelFile = async (req, res, next) => {
       }
     }
 
-    res
-      .status(201)
-      .json({ message: "Concerts added successfully from Excel file." });
+    await concert.populate("saison");
+
+    res.status(200).json({
+      message: "Concerts added successfully from Excel file.",
+      payload: concert,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error adding concerts from Excel file." });
   }
 };
+
 
 const convertExcelToJson = (path) => {
   const work = xlsx.readFile(path);
