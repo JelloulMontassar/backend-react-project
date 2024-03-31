@@ -288,13 +288,17 @@ const getCandidats = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const candidats = await Candidat.find(filter).skip(skip).limit(limit);
+    // const candidats = await Candidat.find(filter).skip(skip).limit(limit);
+    const candidats = await Candidat.find({}).populate({
+      path: "audition",
+      populate: {
+        path: "saison",
+      },
+    });
 
     res.status(200).json({
       success: true,
-      data: {
-        candidats,
-      },
+      payload: candidats,
     });
   } catch (error) {
     console.error(error);
@@ -434,6 +438,12 @@ const updateCandidat = async (req, res) => {
         )
       );
     }
+    await updatedCandidat.populate({
+      path: "audition",
+      populate: {
+        path: "saison",
+      },
+    });
     res.status(200).json({
       message: "Candidat mise à jour avec succès",
       payload: updatedCandidat,
@@ -443,6 +453,20 @@ const updateCandidat = async (req, res) => {
     res
       .status(500)
       .json({ message: "Erreur lors de la mise à jour l'audition" });
+  }
+};
+const deleteCandidat = async (req, res) => {
+  try {
+    await Candidat.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: "Candidat supprimé avec succès",
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la supprission de l'audition" });
   }
 };
 
@@ -611,5 +635,6 @@ module.exports = {
   reject,
   notifieradmin,
   postCandidat,
-  updateCandidat
+  updateCandidat,
+  deleteCandidat
 };

@@ -31,6 +31,7 @@ const candidatSchema = new mongoose.Schema(
     },
     extrait_chante: { type: String },
     tessiture: { type: String },
+    remarque: { type: String },
     audition: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Audition",
