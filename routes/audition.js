@@ -28,8 +28,8 @@ router.post(
 );
 router.get(
   "/planning/:id",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   AuditionController.getPlanning
 );
 
