@@ -7,6 +7,7 @@ const ajout = async (req, res) => {
   try {
     const oeuvre = new Oeuvre(req.body);
     await oeuvre.save();
+    await oeuvre.populate("pupitre");
     res.status(201).send(oeuvre);
   } catch (error) {
     res.status(400).send(error);
@@ -43,6 +44,7 @@ const updateoeuvre = async (req, res) => {
     if (!oeuvre) {
       return res.status(404).send();
     }
+    await oeuvre.populate("pupitre");
     res.send(oeuvre);
   } catch (error) {
     res.status(400).send(error);

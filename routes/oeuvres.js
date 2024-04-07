@@ -5,8 +5,8 @@ const oeuvresController = require("../controllers/oeuvres");
 
 router.get(
   "/statistiqueParOeuvre",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   oeuvresController.statistiqueParOeuvre
 );
 
@@ -30,8 +30,8 @@ router.get(
 );
 router.delete(
   "/:id",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   oeuvresController.deleteoeuvre
 );
 router.patch(
