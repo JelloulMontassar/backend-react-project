@@ -35,8 +35,8 @@ router.get(
 
 router.post(
   "/genererPlanification",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   requestValidator.validateAuditionPlanification,
   AuditionController.genererPlanification
 );

@@ -286,7 +286,7 @@ const getCandidats = async (req, res) => {
     const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const candidats = [];
+    let candidats = [];
     if (page) {
       candidats = await Candidat.find(filter)
         .skip(skip)
