@@ -15,7 +15,7 @@ const ajout = async (req, res) => {
 
 const getoeuvre = async (req, res) => {
   try {
-    const oeuvres = await Oeuvre.find();
+    const oeuvres = await Oeuvre.find({}).populate("pupitre");
     res.send(oeuvres);
   } catch (error) {
     res.status(500).send(error);
@@ -72,25 +72,27 @@ const statistiqueParOeuvre = async (req, res) => {
         idOeuvre: oeuvre._id,
         titre: oeuvre.titre,
         compositeur: oeuvre.compositeur,
-        
+
         totalConcerts: 0,
       };
 
       for (const concert of concerts) {
         const repetitions = await Repetition.find({
           concert: concert._id,
-          'presence.oeuvreId': oeuvre._id,
+          "presence.oeuvreId": oeuvre._id,
         });
 
         const nombreTotalRepetitions = repetitions.length;
         const nombrePresent = repetitions.reduce((total, rep) => {
-          const presence = rep.presence.find((p) => p.oeuvreId.toString() === oeuvre._id.toString() && p.present);
+          const presence = rep.presence.find(
+            (p) => p.oeuvreId.toString() === oeuvre._id.toString() && p.present
+          );
           return total + (presence ? 1 : 0);
         }, 0);
 
-
-
-        const concertsAvecOeuvre = concerts.filter(c => c.programme.includes(oeuvre._id.toString()));
+        const concertsAvecOeuvre = concerts.filter((c) =>
+          c.programme.includes(oeuvre._id.toString())
+        );
 
         statistiqueOeuvre.totalConcerts += concertsAvecOeuvre.length;
       }
@@ -114,5 +116,5 @@ module.exports = {
   getoeuvrebyId,
   deleteoeuvre,
   updateoeuvre,
-  statistiqueParOeuvre
+  statistiqueParOeuvre,
 };
