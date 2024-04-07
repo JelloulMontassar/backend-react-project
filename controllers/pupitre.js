@@ -34,6 +34,21 @@ const defineNeeds = async (req, res) => {
     });
   }
 };
+const getAll = async (req, res) => {
+  try {
+    const pupitre = await Pupitre.find({});
+
+    res.status(200).json({
+      payload: pupitre,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "server error ",
+      error: error.message,
+    });
+  }
+};
 const designer2Chefs = async (req, res) => {
   try {
     const { pupitreId, chef1Id, chef2Id } = req.body;
@@ -227,7 +242,7 @@ const changeTissiture = async (req, res) => {
         });
         const choriste = await User.findOne({ _id: userId });
         io.emit(`notif-${oldPupitreChef._id.toString()}`, {
-        message: `Le choriste ${choriste.nom} ${choriste.prenom} a changé de tessiture de ${oldTypeVoix} à ${type_voix}`,
+          message: `Le choriste ${choriste.nom} ${choriste.prenom} a changé de tessiture de ${oldTypeVoix} à ${type_voix}`,
         });
 
         res.status(200).json({
@@ -251,4 +266,5 @@ module.exports = {
   defineNeeds,
   designer2Chefs,
   changeTissiture,
+  getAll
 };

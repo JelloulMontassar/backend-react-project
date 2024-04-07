@@ -13,7 +13,6 @@ const {
 const { accountEmailTemplate } = require("../utils/accountEmailTemplate");
 const { generateRandomPassword, hashPassword } = require("../utils/passwords");
 
-
 //   const { nom, prenom, email } = req.body;
 //   const transporter = nodemailer.createTransport({
 //     service: "gmail",
@@ -89,8 +88,8 @@ const sentmail = async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-    user: "ghaly4045@gmail.com", 
-    pass: "fppb rqus basw bxtw",
+      user: "ghaly4045@gmail.com",
+      pass: "fppb rqus basw bxtw",
     },
     tls: {
       rejectUnauthorized: false, // Désactiver la vérification du certificat
@@ -99,13 +98,14 @@ const sentmail = async (req, res) => {
 
   try {
     const existingEmail = await Candidattest.findOne({ email });
-    console.log(existingEmail)
+    console.log(existingEmail);
 
-        if (existingEmail) {
+    if (existingEmail) {
       console.log("Email déjà existant dans la base de données");
       return res.status(200).json({
-        message: "Adresse e-mail valide mais existante dans la base de données.",
-        emailExists: true
+        message:
+          "Adresse e-mail valide mais existante dans la base de données.",
+        emailExists: true,
       });
     } else {
       // Générer le token JWT uniquement si l'email est nouveau
@@ -128,7 +128,7 @@ const sentmail = async (req, res) => {
               <p>Hello ${nom} ${prenom},</p>
               <p>Votre email est valide. Cliquez sur le lien suivant pour confirmer votre inscription :</p>
               <a href="${confirmation}">Confirmation</a>
-            `,          
+            `,
           };
           transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
@@ -147,8 +147,8 @@ const sentmail = async (req, res) => {
           });
         }
       );
-    }}
-   catch (error) {
+    }
+  } catch (error) {
     console.error(error);
     return res.status(500).json({
       message: "Erreur lors de la validation de l'adresse e-mail.",
@@ -203,7 +203,9 @@ const confirmation = async (req, res) => {
   try {
     const { token } = req.query;
     if (!token) {
-      return res.status(400).json({ success: false, message: "Token not found in cookies." });
+      return res
+        .status(400)
+        .json({ success: false, message: "Token not found in cookies." });
     }
     jwt.verify(
       token,
@@ -218,7 +220,8 @@ const confirmation = async (req, res) => {
         if (existingEmail) {
           return res.status(200).json({
             success: true,
-            message: "Adresse e-mail valide et existante dans la base de données.",
+            message:
+              "Adresse e-mail valide et existante dans la base de données.",
           });
         }
 
@@ -229,7 +232,7 @@ const confirmation = async (req, res) => {
         });
 
         await newCandidat.save();
-        
+
         // Au lieu de la redirection, renvoyer un message JSON avec le statut de succès
         return res.status(200).json({
           success: true,
@@ -241,10 +244,6 @@ const confirmation = async (req, res) => {
     return res.status(500).json({ success: false, message: err.message });
   }
 };
-
-
-
-
 
 const getCandidats = async (req, res) => {
   try {
@@ -284,18 +283,28 @@ const getCandidats = async (req, res) => {
       };
     }
 
-    const page = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page);
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-
-    // const candidats = await Candidat.find(filter).skip(skip).limit(limit);
-    const candidats = await Candidat.find({}).populate({
-      path: "audition",
-      populate: {
-        path: "saison",
-      },
-    });
-
+    let candidats = [];
+    if (page) {
+      candidats = await Candidat.find(filter)
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "audition",
+          populate: {
+            path: "saison",
+          },
+        });
+    } else {
+      candidats = await Candidat.find(filter).populate({
+        path: "audition",
+        populate: {
+          path: "saison",
+        },
+      });
+    }
     res.status(200).json({
       success: true,
       payload: candidats,
@@ -636,5 +645,5 @@ module.exports = {
   notifieradmin,
   postCandidat,
   updateCandidat,
-  deleteCandidat
+  deleteCandidat,
 };

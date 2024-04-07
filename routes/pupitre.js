@@ -33,5 +33,6 @@ router.get(
   authMiddleware.loggedMiddleware,
   pupitreController.getChoristesseuilpres
 );
+router.get("/", pupitreController.getAll);
 
 module.exports = router;
