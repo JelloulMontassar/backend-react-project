@@ -1,6 +1,13 @@
 const { notifDanger } = require("./notifinfourgente");
 const server = require("http").createServer();
-const io = require("socket.io")(server);
+
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
+
 
 io.on("connection", (socket) => {
   console.log("a user connected");

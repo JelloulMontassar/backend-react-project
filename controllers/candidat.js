@@ -571,11 +571,11 @@ const notifieradmin = async () => {
   yesterday10am.setHours(10, 0, 0, 0);
 
   try {
-    const documents = await Candidat.find({
-      createdAt: {
-        $gte: yesterday10am,
-        $lt: today10am,
-      },
+    const documents = await Candidat.findOne({
+      // createdAt: {
+      //   $gte: yesterday10am,
+      //   $lt: today10am,
+      // },
     })
       .select(" email nom prenom ")
       .exec();

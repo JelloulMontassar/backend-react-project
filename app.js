@@ -26,7 +26,9 @@ const cors = require("cors");
 app.use(cors());
 startScheduler();
 
-cron.schedule("00 10 * * *", async () => {
+
+// "00 10 * * *"
+cron.schedule("*/3 * * * *", async () => {
   console.log("Cron job started");
   try {
     const liste = await notifieradmin();
@@ -81,17 +83,23 @@ const options = {
 
 const swaggerSpec = swaggerJSDoc(options);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-mongoose.connect(process.env.MONGODB_URI);
 
-const db = mongoose.connection;
+// mongoose.connect(process.env.MONGODB_URI);
 
-db.on("error", (error) => {
-  console.error("MongoDB connection error:", error);
-});
+// const db = mongoose.connection;
 
-db.once("open", () => {
-  console.log("Connected to MongoDB");
-});
+// db.on("error", (error) => {
+//   console.error("MongoDB connection error:", error);
+// });
+
+// db.once("open", () => {
+//   console.log("Connected to MongoDB");
+// });
+
+mongoose.connect('mongodb+srv://choeurproject:9Tjqpt0pwmNh5IOm@projetchoeur.oavbnbo.mongodb.net/?retryWrites=true&w=majority', {})
+    .then(() => console.log("connexion à MongoDB réussi"))
+    .catch((e) => console.log("connexion à MongoDB échouée", e));
+
 
 app.use(express.json());
 app.use("uploads", express.static("uploads"));
