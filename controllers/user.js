@@ -172,7 +172,7 @@ const consulterHistoriqueStatut = async (req, res) => {
     // save db
     const existingHistoriqueStatut = await HistoriqueStatut.findOne({
       user: user._id,
-    })
+    });
 
     if (existingHistoriqueStatut) {
       existingHistoriqueStatut.yearsAndStatus = historiqueStatut;
@@ -210,8 +210,8 @@ const consulterProfil = async (req, res) => {
       return res.status(404).json({ success: false, error: "User not found" });
     }
     const saison = await Saison.findOne();
-    const listeElimines = saison.ListeDesElimines
-    const listeNomines = saison.ListeDesNomines
+    const listeElimines = saison.ListeDesElimines;
+    const listeNomines = saison.ListeDesNomines;
 
     const isEliminated = saison.ListeDesElimines.includes(userId);
     const isNominated = saison.ListeDesNomines.includes(userId);
@@ -224,8 +224,7 @@ const consulterProfil = async (req, res) => {
       isEliminated: isEliminated,
       isNominated: isNominated,
       listeNomines: listeNomines,
-      listeElimines: listeElimines
-
+      listeElimines: listeElimines,
     };
 
     return res.status(200).json({ success: true, data: responseData });
@@ -332,7 +331,7 @@ const getListesChoristesDisponibles = async (req, res) => {
     }
 
     let query = {
-      "Concerts.Concert": idConcert,
+      role: "choriste",
       "Concerts.disponibilite": true,
     };
 
@@ -348,9 +347,22 @@ const getListesChoristesDisponibles = async (req, res) => {
       }
     }
 
-    const choristesDisponibles = await User.find(query).select(
-      "prenom nom telephone email"
-    );
+    const choristes = await User.find(query);
+
+    const choristesDisponibles = choristes
+      .filter((choriste) =>
+        choriste.Concerts.some(
+          (concert) =>
+            concert.Concert.toString() === idConcert &&
+            concert.disponibilite === true
+        )
+      )
+      .map(({ prenom, nom, telephone, email }) => ({
+        prenom,
+        nom,
+        telephone,
+        email,
+      }));
 
     res.json({ choristes: choristesDisponibles });
   } catch (error) {
@@ -361,6 +373,7 @@ const getListesChoristesDisponibles = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
 const getListeAbsenceChoriste = async (req, res) => {
   try {
     const userId = req.auth.userId;
