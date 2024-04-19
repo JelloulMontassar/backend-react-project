@@ -3,13 +3,22 @@ const router = express.Router();
 const SaisonController = require("../controllers/saison");
 const authMiddleware=require("../middlewares/auth");
 
-router.post("/createsaison", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.createSaison);
+router.post("/createsaison", 
+// authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
+SaisonController.createSaison);
 router.get("/getsaisons", 
 // authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
 SaisonController.getSaison);
-router.delete("/deleteSaison/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.deleteSaison);
-router.patch("/updatesaison/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.updateSaison);
-router.get("/getsaisonbyid/:id", authMiddleware.loggedMiddleware,authMiddleware.isAdmin, SaisonController.getSaisonbyId);
+router.delete("/deleteSaison/:id", 
+// authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
+SaisonController.deleteSaison);
+router.patch("/updatesaison/:id",
+//  authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
+ SaisonController.updateSaison);
+router.get("/getsaisonbyid/:id", 
+// authMiddleware.loggedMiddleware,authMiddleware.isAdmin, 
+SaisonController.getSaisonbyId);
+
 router.patch('/updateSeuils/:saisonId',authMiddleware.loggedMiddleware, authMiddleware.isAdmin, SaisonController.updateSeuils);
 router.get("/getListeNominationSaisonActuelle/:saisonId",authMiddleware.loggedMiddleware, authMiddleware.isAdmin,SaisonController.getListeNominations);
 router.get("/getListeEliminationSaisonActuelle/:saisonId",authMiddleware.loggedMiddleware, authMiddleware.isAdmin,SaisonController.getListeEliminations);
