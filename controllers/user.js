@@ -798,7 +798,7 @@ const getListeAbsenceRepetitions = async (req, res) => {
                 nom: repetitionData.concert.nom,
                 saison:
                   repetitionData.concert.saison &&
-                  repetitionData.concert.saison.nom
+                    repetitionData.concert.saison.nom
                     ? repetitionData.concert.saison.nom
                     : "Non définie",
                 programmeOeuvres: programmeOeuvres,
@@ -919,6 +919,16 @@ const statistiqueParChoriste = async (req, res) => {
   }
 };
 
+const getAllChoriste = async (req, res) => {
+  try {
+    const choristes = await User.find({ role: 'choriste' });
+    res.status(200).json({ success: true, data: choristes });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Erreur serveur' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -940,4 +950,5 @@ module.exports = {
   eliminerChoristeDicipline,
   getListeAbsenceRepetitions,
   statistiqueParChoriste,
+  getAllChoriste
 };
