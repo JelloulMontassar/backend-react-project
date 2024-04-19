@@ -32,6 +32,7 @@ router.get(
   // authMiddleware.isAdmin,
   AuditionController.getPlanning
 );
+router.get('/getallaudition', AuditionController.getAuditions);
 
 router.post(
   "/genererPlanification",
