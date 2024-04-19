@@ -3,10 +3,31 @@ const Candidat = require("../models/candidat");
 const { envoyerEmail, envoyerEmail2 } = require("../utils/AuditionTimeMail");
 const moment = require("moment");
 
-const getAudition = async (req, res) => {
+// const getAudition = async (req, res) => {
+//   try {
+//     const auditions = await Audition.find({});
+//     res.status(200).json({ message: "Success", payload: auditions });
+//   } catch (error) {
+//     console.error(error);
+//     res
+//       .status(500)
+//       .json({ message: "Erreur lors de récupération de l'audition" });
+//   }
+// };
+
+const getAudition = async (req, res, next) => {
   try {
-    const auditions = await Audition.find({});
-    res.status(200).json({ message: "Success", payload: auditions });
+    const auditionId = req.params.id;
+
+    const audition = await Audition.findById(auditionId).populate("saison");
+
+    if (!audition) {
+      return res.status(404).json({ message: "Audition non trouvée" });
+    }
+
+    res
+      .status(201)
+      .json({ message: "Audition affichée avec succès", audition });
   } catch (error) {
     console.error(error);
     res
