@@ -922,12 +922,26 @@ const statistiqueParChoriste = async (req, res) => {
 const getAllChoriste = async (req, res) => {
   try {
     const choristes = await User.find({ role: 'choriste' });
-    res.status(200).json({ success: true, data: choristes });
+    const choristesAvecTessiture = await Promise.all(choristes.map(async (choriste) => {
+      const pupitres = await Pupitre.find({});
+      const pupitreChoriste = pupitres.find((pupitre) => pupitre.membres.includes(choriste._id));
+      const tessiture = pupitreChoriste ? pupitreChoriste.type_voix : null;
+      return {
+        _id: choriste._id,
+        nom: choriste.nom,
+        prenom: choriste.prenom,
+        telephone: choriste.telephone,
+        email: choriste.email,
+        tessiture: tessiture,
+      };
+    }));
+    res.status(200).json({ success: true, data: choristesAvecTessiture });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: 'Erreur serveur' });
   }
 };
+
 
 module.exports = {
   getAllUsers,
