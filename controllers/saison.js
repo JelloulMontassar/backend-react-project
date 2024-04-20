@@ -8,28 +8,14 @@ const userController = require("./user")
 
 const createSaison = async (req, res) => {
   try {
-    const { nom, dateDebut, dateFin, seuil_absence, archive } = req.body;
-    const dateActuelle = new Date();
+    const nouvelleSaison = new Saison(req.body);
+    await nouvelleSaison.save();
 
-    await Saison.updateOne(
-      { dateFin: { $lte: dateActuelle } },
-      { $set: { archive: true } }
-    );
+    await Saison.updateMany({ _id: { $ne: nouvelleSaison._id } }, { $set: { archive: true } });
 
-    const nouvelleSaison = new Saison({
-      nom,
-      dateDebut,
-      dateFin,
-      seuil_absence,
-      archive,
-    });
-
-    const saisonEnregistree = await nouvelleSaison.save();
-
-    res.status(201).json({ success: true, data: saisonEnregistree });
+    res.status(201).json({ success: true, msg: "Saison ajoutée avec succès" });
   } catch (error) {
-    console.error("Erreur lors de la création de la saison :", error.message);
-    res.status(500).json({ success: false, message: "Erreur serveur" });
+    res.status(500).json({ success: false, message: "Erreur lors de l'ajout de la saison", error: error.message });
   }
 };
 

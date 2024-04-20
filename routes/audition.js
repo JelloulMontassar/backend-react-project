@@ -22,8 +22,8 @@ router.delete(
 
 router.post(
   "/",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   AuditionController.createAudition
 );
 router.get(
