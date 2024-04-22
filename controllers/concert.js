@@ -414,6 +414,42 @@ const informerAbsence = async (req, res) => {
   }
 };
 
+const findActiveSeasonId = async () => {
+  try {
+    const season = await Saison.findOne({ archive: false });
+    if (!season) {
+      return res.status(404).json({ message: "Aucune saison active trouvée" });
+    }
+    console.log("11")
+    return season._id;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erreur lors de la recherche de la saison active");
+  }
+};
+const getConcertsForActiveSeason = async (req, res, next) => {
+  try {
+    const activeSeasonId = await findActiveSeasonId();
+    if (!activeSeasonId) {
+      return res.status(404).json({ message: "Aucune saison active trouvée" });
+    }
+
+    const concerts = await Concert.find({ saison: activeSeasonId }).populate("saison");
+    if (concerts.length === 0) {
+      console.log("Pas de concerts dans cette saison");
+    }
+    res.status(200).json({
+      message: "L'affichage des Concerts de la saison active est effectué avec succès",
+      concerts,
+    });
+  } catch (error) {
+    console.error("Erreur lors de l'affichage des Concerts de la saison active:", error);
+    res.status(500).json({ message: "Erreur lors de l'affichage des Concerts de la saison active" });
+  }
+};
+
+
+
 module.exports = {
   SaveSeuilconcert,
   addConcert,
@@ -427,4 +463,6 @@ module.exports = {
   statistiqueParConcert,
   informerAbsence,
   getConcerts,
+  getConcertsForActiveSeason,
+  findActiveSeasonId
 };
