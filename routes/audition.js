@@ -22,8 +22,8 @@ router.delete(
 
 router.post(
   "/",
-  authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,
+  // authMiddleware.loggedMiddleware,
+  // authMiddleware.isAdmin,
   AuditionController.createAudition
 );
 router.get(
@@ -32,6 +32,7 @@ router.get(
   // authMiddleware.isAdmin,
   AuditionController.getPlanning
 );
+router.get('/getallaudition', AuditionController.getAuditions);
 
 router.post(
   "/genererPlanification",

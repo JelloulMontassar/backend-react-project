@@ -339,6 +339,17 @@ async function getPlanning(req, res) {
   }
 }
 
+
+async function getAuditions(req, res) {
+  try {
+    const auditions = await Audition.find();
+    res.status(200).json({ success: true, data: auditions });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des auditions :", error.message);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+}
+
 module.exports = {
   updateAudition,
   getAudition,
@@ -347,4 +358,5 @@ module.exports = {
   createAudition,
   getPlanning,
   genererPlanification2,
+  getAuditions
 };

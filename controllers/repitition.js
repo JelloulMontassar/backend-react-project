@@ -1,8 +1,11 @@
 const Repetition = require("../models/repetition");
 const Concert = require("../models/concert");
 const Pupitre = require("../models/pupitre");
-const {genererQrCodeAleatoire,isQRCodeUnique} = require("../utils/genererQrCode");
-const User = require("../models/user")
+const {
+  genererQrCodeAleatoire,
+  isQRCodeUnique,
+} = require("../utils/genererQrCode");
+const User = require("../models/user");
 async function create(req, res) {
   try {
     const concert = await Concert.findById(req.body.concert);
@@ -46,7 +49,18 @@ async function create(req, res) {
 
 async function getAll(req, res) {
   try {
-    const repetitions = await Repetition.find();
+    const repetitions = await Repetition.find()
+      .populate("concert", "nom") 
+      .populate({
+        path: "pupitres.pupitre", 
+        model: "Pupitre",
+        select: "type_voix",
+      })
+      .populate({
+        path: "participants",
+        model: "User",
+        select: "nom prenom"
+      });
     res.status(200).json({ payload: repetitions });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -103,10 +117,14 @@ const informerAbsence = async (req, res) => {
       return res.status(404).json({ message: "User not found !" });
     }
 
-    const repetitionUser = user.Repetitions.find((c) => c.repetition.toString() == id);
+    const repetitionUser = user.Repetitions.find(
+      (c) => c.repetition.toString() == id
+    );
 
     if (!repetitionUser) {
-      return res.status(404).json({ message: "User has not this repetition !" });
+      return res
+        .status(404)
+        .json({ message: "User has not this repetition !" });
     }
 
     repetitionUser.presence = false;
@@ -125,5 +143,5 @@ module.exports = {
   getById,
   update,
   remove,
-  informerAbsence
+  informerAbsence,
 };
