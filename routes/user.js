@@ -7,8 +7,17 @@ const authMiddleware = require("../middlewares/auth");
 router.get("/consulterlisteChoriste", userController.getAllChoriste)
 
 router.get('/statistiqueParChoriste', authMiddleware.loggedMiddleware, authMiddleware.isAdmin, userController.statistiqueParChoriste);
-router.get("/getAllUserActivityHistory", authMiddleware.loggedMiddleware, authMiddleware.isAdmin, requestValidator.validateGetAllUserActivityHistory, authMiddleware.loggedMiddleware, userController.getAllUserActivityHistory);
-router.get("/ActivityHistory", authMiddleware.loggedMiddleware, authMiddleware.isChoriste, requestValidator.validateGetUserActivityHistory, authMiddleware.loggedMiddleware, userController.getUserActivityHistory);
+router.get("/getAllUserActivityHistory", 
+// authMiddleware.loggedMiddleware, authMiddleware.isAdmin, requestValidator.validateGetAllUserActivityHistory,*
+//  authMiddleware.loggedMiddleware, 
+ userController.getAllUserActivityHistory);
+router.get("/ActivityHistory",
+ authMiddleware.loggedMiddleware, 
+ authMiddleware.isChoriste, 
+ requestValidator.validateGetUserActivityHistory, 
+ authMiddleware.loggedMiddleware, 
+ userController.getUserActivityHistory);
+
 router.get("/getListeAbsenceRepetitions", authMiddleware.loggedMiddleware, authMiddleware.isAdmin, requestValidator.validateGetListeAbsenceRepetitions, userController.getListeAbsenceRepetitions);
 router.patch("/indiquerPresenceManuelleRep", authMiddleware.loggedMiddleware, authMiddleware.isChefDePupitre, requestValidator.validateIndiquerPresenceManuelleRep, userController.indiquerPresenceManuelleRep);
 router.patch("/indiquerPresenceManuelleCon", authMiddleware.loggedMiddleware, authMiddleware.isChefDePupitre, requestValidator.validateIndiquerPresenceManuelleCon, userController.indiquerPresenceManuelleCon);
