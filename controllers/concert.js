@@ -420,7 +420,6 @@ const findActiveSeasonId = async () => {
     if (!season) {
       return res.status(404).json({ message: "Aucune saison active trouvée" });
     }
-    console.log("11")
     return season._id;
   } catch (error) {
     console.error(error);
@@ -433,10 +432,10 @@ const getConcertsForActiveSeason = async (req, res, next) => {
     if (!activeSeasonId) {
       return res.status(404).json({ message: "Aucune saison active trouvée" });
     }
-
     const concerts = await Concert.find({ saison: activeSeasonId }).populate("saison");
     if (concerts.length === 0) {
-      console.log("Pas de concerts dans cette saison");
+      
+      //console.log("Pas de concerts dans cette saison");
     }
     res.status(200).json({
       message: "L'affichage des Concerts de la saison active est effectué avec succès",

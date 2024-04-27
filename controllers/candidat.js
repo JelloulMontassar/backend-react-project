@@ -572,10 +572,10 @@ const notifieradmin = async () => {
 
   try {
     const documents = await Candidat.findOne({
-      // createdAt: {
-      //   $gte: yesterday10am,
-      //   $lt: today10am,
-      // },
+      createdAt: {
+        $gte: yesterday10am,
+        $lt: today10am,
+      },
     })
       .select(" email nom prenom ")
       .exec();
@@ -603,7 +603,18 @@ const postCandidat = async (req, res) => {
       sexe,
     } = req.body;
 
-    // Formater la date avec moment
+    const candidatExistant = await Candidat.findOne({ email });
+
+  if (candidatExistant) {
+    console.log("existe déja");
+    res.status(201).json({ success: true, isNew: false, message: "Un candidat avec cet email existe déjà" });
+  } 
+  else 
+  {
+    // Candidat nouvellement ajouté
+    //const candidatEnregistre = await nouveauCandidat.save();
+    //res.status(201).json({ success: true, isNew: true, data: candidatEnregistre });
+
     const dateNaissanceFormatee = moment(
       date_de_naissance,
       "DD/MM/YYYY"
@@ -628,11 +639,14 @@ const postCandidat = async (req, res) => {
       success: true,
       data: candidatEnregistre,
     });
+  }
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 };
+
+
 module.exports = {
   sentmail,
   confirmation,
