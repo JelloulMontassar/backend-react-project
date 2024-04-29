@@ -293,6 +293,7 @@ const indiquerDisponibilite = async (req, res) => {
 
     const userId = req.auth.userId;
     const user = await User.findById(userId);
+    const concert = await Concert.findById(idConcert);
 
     const concertUser = user.Concerts.find(
       (c) => c.Concert && c.Concert.toString() === idConcert
@@ -301,12 +302,16 @@ const indiquerDisponibilite = async (req, res) => {
     if (!concertUser) {
       return res.status(404).json({ message: "User non concerné" });
     }
-
+    if (concertUser.disponibilite) {
+      return res
+        .status(400)
+        .json({ message: "user a deja confirmé son presence" });
+    }
     concertUser.disponibilite = disponibilite;
     await user.save();
 
     if (disponibilite) {
-      await envoyerEmail(user);
+      await envoyerEmail(user, concert.nom);
       return res
         .status(200)
         .json({ message: "Utilisateur confirme sa présence au concert" });
@@ -798,7 +803,7 @@ const getListeAbsenceRepetitions = async (req, res) => {
                 nom: repetitionData.concert.nom,
                 saison:
                   repetitionData.concert.saison &&
-                    repetitionData.concert.saison.nom
+                  repetitionData.concert.saison.nom
                     ? repetitionData.concert.saison.nom
                     : "Non définie",
                 programmeOeuvres: programmeOeuvres,
@@ -921,27 +926,30 @@ const statistiqueParChoriste = async (req, res) => {
 
 const getAllChoriste = async (req, res) => {
   try {
-    const choristes = await User.find({ role: 'choriste' });
-    const choristesAvecTessiture = await Promise.all(choristes.map(async (choriste) => {
-      const pupitres = await Pupitre.find({});
-      const pupitreChoriste = pupitres.find((pupitre) => pupitre.membres.includes(choriste._id));
-      const tessiture = pupitreChoriste ? pupitreChoriste.type_voix : null;
-      return {
-        _id: choriste._id,
-        nom: choriste.nom,
-        prenom: choriste.prenom,
-        telephone: choriste.telephone,
-        email: choriste.email,
-        tessiture: tessiture,
-      };
-    }));
+    const choristes = await User.find({ role: "choriste" });
+    const choristesAvecTessiture = await Promise.all(
+      choristes.map(async (choriste) => {
+        const pupitres = await Pupitre.find({});
+        const pupitreChoriste = pupitres.find((pupitre) =>
+          pupitre.membres.includes(choriste._id)
+        );
+        const tessiture = pupitreChoriste ? pupitreChoriste.type_voix : null;
+        return {
+          _id: choriste._id,
+          nom: choriste.nom,
+          prenom: choriste.prenom,
+          telephone: choriste.telephone,
+          email: choriste.email,
+          tessiture: tessiture,
+        };
+      })
+    );
     res.status(200).json({ success: true, data: choristesAvecTessiture });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Erreur serveur' });
+    res.status(500).json({ success: false, message: "Erreur serveur" });
   }
 };
-
 
 module.exports = {
   getAllUsers,
@@ -964,5 +972,5 @@ module.exports = {
   eliminerChoristeDicipline,
   getListeAbsenceRepetitions,
   statistiqueParChoriste,
-  getAllChoriste
+  getAllChoriste,
 };

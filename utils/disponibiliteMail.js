@@ -1,11 +1,11 @@
 const mailSender = require("./mailsender");
 
-async function envoyerEmail(user) {
+async function envoyerEmail(user,concert) {
   try {
     const sujetEmail = "Confirmation de présence pour un concert";
     const contenuEmail = `
       <p>Bonjour ${user.prenom} ${user.nom},</p>
-      <p>Vous avez indiqué votre disponibilité au prochain concert </p>
+      <p>Vous avez indiqué votre disponibilité au prochain concert : ${concert}</p>
       <p>Cordialement,<br/>Orchestre symphonique de Carthage</p>
     `;
       await mailSender.sendEmail(sujetEmail, user.email, contenuEmail);
