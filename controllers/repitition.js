@@ -50,16 +50,16 @@ async function create(req, res) {
 async function getAll(req, res) {
   try {
     const repetitions = await Repetition.find()
-      .populate("concert", "nom") 
+      .populate("concert", "nom")
       .populate({
-        path: "pupitres.pupitre", 
+        path: "pupitres.pupitre",
         model: "Pupitre",
         select: "type_voix",
       })
       .populate({
         path: "participants",
         model: "User",
-        select: "nom prenom"
+        select: "nom prenom",
       });
     res.status(200).json({ payload: repetitions });
   } catch (error) {
@@ -69,7 +69,18 @@ async function getAll(req, res) {
 
 async function getById(req, res) {
   try {
-    const repetition = await Repetition.findById(req.params.id);
+    const repetition = await Repetition.findById(req.params.id)
+      .populate("concert", "nom")
+      .populate({
+        path: "pupitres.pupitre",
+        model: "Pupitre",
+        select: "type_voix",
+      })
+      .populate({
+        path: "participants",
+        model: "User",
+        select: "nom prenom",
+      });
     if (!repetition) {
       return res.status(404).json({ error: "repetition not found" });
     }
