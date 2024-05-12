@@ -127,11 +127,12 @@ const consulterStatut = async (req, res) => {
 };
 const consulterHistoriqueStatut = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+      const user = await User.findOne({ id_national : req.params.id });
 
-    if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
-    }
+      if (!user) {
+        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
+      }
+
 
     const dateIntegrationUser = new Date(user.createdAt);
     const saisonActuelle = await Saison.findOne().sort({ dateDebut: -1 });
@@ -180,7 +181,7 @@ const consulterHistoriqueStatut = async (req, res) => {
       res.status(200).json({
         success: true,
         message: `Historique - Statut du : ${user.nom} ${user.prenom}`,
-        data: historiqueStatut,
+        data: existingHistoriqueStatut,user
       });
     } else {
       await HistoriqueStatut.create({
@@ -190,7 +191,7 @@ const consulterHistoriqueStatut = async (req, res) => {
       res.status(201).json({
         success: true,
         message: "HistoriqueStatut créé avec succès",
-        data: historiqueStatut,
+        data: historiqueStatut,user
       });
     }
   } catch (error) {
@@ -854,7 +855,12 @@ const getListeAbsenceRepetitions = async (req, res) => {
 
 const statistiqueParChoriste = async (req, res) => {
   try {
-    const choristes = await User.find({ role: "choriste" });
+    const choristes = await User.find({ id_national: req.params.id , role: "choriste" });
+    if (! choristes){
+       console.log("000",choristes)
+        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
+    }
+    console.log("111",choristes)
     const concerts = await Concert.find();
 
     const statistiquesChoristes = [];

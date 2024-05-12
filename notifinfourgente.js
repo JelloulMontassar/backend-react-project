@@ -4,7 +4,8 @@ const User = require("./models/user");
 const Repetition = require("./models/repetition");
 const Notification = require("./models/notification");
 
-async function notifDanger(socket, io) {
+async function notifDanger(socket, io) 
+{
   socket.on("setClientId", async (clientId) => {
     console.log(`Client with ID ${clientId} connected`);
     const user = await User.findOne({ _id: clientId, status: "actif" });

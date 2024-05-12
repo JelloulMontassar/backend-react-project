@@ -562,6 +562,7 @@ const reject = async (req, res) => {
     });
   }
 };
+
 const notifieradmin = async () => {
   const today10am = new Date();
   today10am.setHours(15, 0, 0, 0);
@@ -579,7 +580,7 @@ const notifieradmin = async () => {
     })
       .select(" email nom prenom ")
       .exec();
-    console.log(documents);
+    //console.log(documents);
 
     return documents;
   } catch (error) {
@@ -638,6 +639,7 @@ const postCandidat = async (req, res) => {
     res.status(201).json({
       success: true,
       data: candidatEnregistre,
+      isNew: true
     });
   }
   } catch (error) {

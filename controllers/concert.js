@@ -434,7 +434,10 @@ const getConcertsForActiveSeason = async (req, res, next) => {
     }
     const concerts = await Concert.find({ saison: activeSeasonId }).populate("saison");
     if (concerts.length === 0) {
-      
+    //   res.status(200).json({
+    //   message: "Pas de concerts pour cette saison",
+    //   concerts,
+    // });
       //console.log("Pas de concerts dans cette saison");
     }
     res.status(200).json({

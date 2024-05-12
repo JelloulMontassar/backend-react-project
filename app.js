@@ -39,6 +39,9 @@ cron.schedule("00 10 * * *", async () => {
         liste,
       });
     }
+    else{
+      console.log("no candidat !!")
+    }
   } catch (error) {
     console.error("Error in cron job:", error);
   }

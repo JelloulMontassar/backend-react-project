@@ -6,8 +6,8 @@ const uploadExcelMiddleware = require("../middlewares/excelUpload");
 const authMiddleware=require("../middlewares/auth");
 
 
-router.get('/statistiqueParConcert' , authMiddleware.loggedMiddleware,
-authMiddleware.isAdmin,ConcertController.statistiqueParConcert);
+router.get('/statistiqueParConcert' , /*authMiddleware.loggedMiddleware,
+authMiddleware.isAdmin, */ConcertController.statistiqueParConcert);
 
 
 router.post(
