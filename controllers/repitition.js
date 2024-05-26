@@ -14,8 +14,9 @@ async function create(req, res) {
       const participants = [];
       for (let j = 0; j < req.body.pupitres.length; j++) {
         const element = req.body.pupitres[j];
-        const pupitre = await Pupitre.findById(element.pupitre);
+        const pupitre = await Pupitre.findOne({ type_voix: element.pupitre });
         if (pupitre) {
+          req.body.pupitres[j].pupitre = pupitre._id; // Utiliser l'ObjectId du pupitre
           const len = (element.pourcentage / 100) * pupitre.membres.length;
           for (let i = 0; i < len; i++) {
             participants.push(pupitre.membres[i]);
@@ -37,7 +38,31 @@ async function create(req, res) {
 
       repetition.qrCode.code = codeQR;
       repetition.qrCode.image = imageQr;
+
       const savedrepetition = await repetition.save();
+      await savedrepetition.populate([
+        { path: "concert" },
+        {
+          path: "pupitres",
+          populate: {
+            path: "pupitre",
+            model: "Pupitre",
+            select: "type_voix",
+          },
+        },
+        {
+          path: "participants",
+          model: "User",
+          select: "nom prenom",
+        },
+      ]);
+      for (let i = 0; i < participants.length; i++) {
+        const user = await User.findById(participants[i]);
+        if (user) {
+          user.Repetitions.push({ repetition: savedrepetition._id });
+          await user.save();
+        }
+      }
       res.status(201).json({ payload: savedrepetition });
     } else {
       return res.status(404).json({ error: "concert not found" });
@@ -100,6 +125,22 @@ async function update(req, res) {
     if (!repetition) {
       return res.status(404).json({ error: "repetition not found" });
     }
+    await repetition.populate([
+      { path: "concert" },
+      {
+        path: "pupitres",
+        populate: {
+          path: "pupitre",
+          model: "Pupitre",
+          select: "type_voix",
+        },
+      },
+      {
+        path: "participants",
+        model: "User",
+        select: "nom prenom",
+      },
+    ]);
     res.status(200).json({ payload: repetition });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -112,11 +153,23 @@ async function remove(req, res) {
     if (!repetition) {
       return res.status(404).json({ error: "repetition not found" });
     }
+
+    // Supprimer la répétition de chaque utilisateur
+    const users = await User.find({ "Repetitions.repetition": req.params.id });
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      user.Repetitions = user.Repetitions.filter(
+        (rep) => rep.repetition.toString() !== req.params.id
+      );
+      await user.save();
+    }
+
     res.status(201).json({ message: "repetition deleted !" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
+
 const informerAbsence = async (req, res) => {
   try {
     const { userId } = req.auth;
