@@ -608,82 +608,82 @@ const indiquerPresenceManuelleCon = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
-const getUserActivityHistory = async (req, res) => {
-  try {
-    const userId = req.auth.userId;
-    const user = await User.findById(userId);
-    const saisonId = req.query.saison;
-    const oeuvreId = req.query.oeuvre;
+// const getUserActivityHistory = async (req, res) => {
+//   try {
+//     const userId = req.auth.userId;
+//     const user = await User.findById(userId);
+//     const saisonId = req.query.saison;
+//     const oeuvreId = req.query.oeuvre;
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    const totalRepetitions = user.Repetitions.length;
-    const totalConcerts = user.Concerts.length;
+//     const totalRepetitions = user.Repetitions.length;
+//     const totalConcerts = user.Concerts.length;
 
-    const repetitionsHistory = await Promise.all(
-      user.Repetitions.map(async (repetition) => {
-        const repetitionData = await Repetition.findById(repetition.repetition);
-        return {
-          date: repetitionData ? repetitionData.date : null,
-          lieu: repetitionData ? repetitionData.lieu : null,
-        };
-      })
-    );
+//     const repetitionsHistory = await Promise.all(
+//       user.Repetitions.map(async (repetition) => {
+//         const repetitionData = await Repetition.findById(repetition.repetition);
+//         return {
+//           date: repetitionData ? repetitionData.date : null,
+//           lieu: repetitionData ? repetitionData.lieu : null,
+//         };
+//       })
+//     );
 
-    const concerts = await Promise.all(
-      user.Concerts.map(async (concert) => {
-        const concertDetails = await Concert.findById(concert.Concert);
-        if (!concertDetails) {
-          return null;
-        }
+//     const concerts = await Promise.all(
+//       user.Concerts.map(async (concert) => {
+//         const concertDetails = await Concert.findById(concert.Concert);
+//         if (!concertDetails) {
+//           return null;
+//         }
 
-        if (saisonId && concertDetails.saison != saisonId) {
-          return null;
-        }
+//         if (saisonId && concertDetails.saison != saisonId) {
+//           return null;
+//         }
 
-        if (oeuvreId && !concertDetails.programme.includes(oeuvreId)) {
-          return null;
-        }
+//         if (oeuvreId && !concertDetails.programme.includes(oeuvreId)) {
+//           return null;
+//         }
 
-        const oueuvres = await Promise.all(
-          concertDetails.programme.map(async (oeuvre) => {
-            const oeuvreData = await Oeuvre.findById(oeuvre);
-            return {
-              title: oeuvreData ? oeuvreData.titre : "Unknown Title",
-            };
-          })
-        );
+//         const oueuvres = await Promise.all(
+//           concertDetails.programme.map(async (oeuvre) => {
+//             const oeuvreData = await Oeuvre.findById(oeuvre);
+//             return {
+//               title: oeuvreData ? oeuvreData.titre : "Unknown Title",
+//             };
+//           })
+//         );
 
-        const saisonData = await Saison.findById(concertDetails.saison);
-        const saisonName = saisonData ? saisonData.nom : "Unknown Season";
+//         const saisonData = await Saison.findById(concertDetails.saison);
+//         const saisonName = saisonData ? saisonData.nom : "Unknown Season";
 
-        return {
-          nom: concertDetails.nom,
-          date: concertDetails.date,
-          lieu: concertDetails.lieu,
-          saison: saisonName,
-          oueuvres,
-        };
-      })
-    );
+//         return {
+//           nom: concertDetails.nom,
+//           date: concertDetails.date,
+//           lieu: concertDetails.lieu,
+//           saison: saisonName,
+//           oueuvres,
+//         };
+//       })
+//     );
 
-    const filteredConcerts = concerts.filter((concert) => concert !== null);
+//     const filteredConcerts = concerts.filter((concert) => concert !== null);
 
-    const activityHistory = {
-      totalRepetitions,
-      totalConcerts,
-      repetitionsHistory,
-      concerts: filteredConcerts,
-    };
+//     const activityHistory = {
+//       totalRepetitions,
+//       totalConcerts,
+//       repetitionsHistory,
+//       concerts: filteredConcerts,
+//     };
 
-    res.json({ activityHistory });
-  } catch (error) {
-    console.error("Error fetching user activity history:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};
+//     res.json({ activityHistory });
+//   } catch (error) {
+//     console.error("Error fetching user activity history:", error);
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// };
 const getAllUserActivityHistory = async (req, res) => {
   try {
     const userIdFilter = req.query.id;
@@ -772,6 +772,85 @@ const getAllUserActivityHistory = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+const getUserActivityHistory = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const user = await User.findById(userId);
+    const { saison: saisonId, oeuvre: oeuvreId } = req.query;
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const totalRepetitions = user.Repetitions.length;
+    const totalConcerts = user.Concerts.length;
+
+    const repetitionsHistory = await Promise.all(
+      user.Repetitions.map(async (repetition) => {
+        const repetitionData = await Repetition.findById(repetition.repetition);
+        return {
+          date: repetitionData ? repetitionData.date : null,
+          lieu: repetitionData ? repetitionData.lieu : null,
+        };
+      })
+    );
+
+    const concerts = await Promise.all(
+      user.Concerts.map(async (concert) => {
+        const concertDetails = await Concert.findById(concert.Concert);
+        if (!concertDetails) {
+          return null;
+        }
+
+        if (saisonId && concertDetails.saison.toString() !== saisonId) {
+          return null;
+        }
+
+        if (oeuvreId && !concertDetails.programme.includes(oeuvreId)) {
+          return null;
+        }
+
+        const oueuvres = await Promise.all(
+          concertDetails.programme.map(async (oeuvre) => {
+            const oeuvreData = await Oeuvre.findById(oeuvre);
+            return {
+              title: oeuvreData ? oeuvreData.titre : "Unknown Title",
+            };
+          })
+        );
+
+        const saisonData = await Saison.findById(concertDetails.saison);
+        const saisonName = saisonData ? saisonData.nom : "Unknown Season";
+
+        return {
+          nom: concertDetails.nom,
+          date: concertDetails.date,
+          lieu: concertDetails.lieu,
+          saison: saisonName,
+          oueuvres,
+        };
+      })
+    );
+
+    const filteredConcerts = concerts.filter((concert) => concert !== null);
+
+    const activityHistory = {
+      totalRepetitions,
+      totalConcerts,
+      repetitionsHistory,
+      concerts: filteredConcerts,
+    };
+
+    res.json({ activityHistory });
+  } catch (error) {
+    console.error("Error fetching user activity history:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 const placementConcert = async (req, res) => {
   try {
     const { placement, concertId, userId } = req.body;
