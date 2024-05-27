@@ -18,6 +18,8 @@ router.get("/ActivityHistory",
  authMiddleware.loggedMiddleware, 
  userController.getUserActivityHistory);
 
+ router.get("/getStatutConge/:id", userController.getStatutConge);
+
 router.get("/getListeAbsenceRepetitions", authMiddleware.loggedMiddleware, authMiddleware.isAdmin, requestValidator.validateGetListeAbsenceRepetitions, userController.getListeAbsenceRepetitions);
 router.patch("/indiquerPresenceManuelleRep", authMiddleware.loggedMiddleware, authMiddleware.isChefDePupitre, requestValidator.validateIndiquerPresenceManuelleRep, userController.indiquerPresenceManuelleRep);
 router.patch("/indiquerPresenceManuelleCon", authMiddleware.loggedMiddleware, authMiddleware.isChefDePupitre, requestValidator.validateIndiquerPresenceManuelleCon, userController.indiquerPresenceManuelleCon);

@@ -13,8 +13,8 @@ router.patch(
 );
 router.patch(
   "/changeTissiture",
-  /*authMiddleware.loggedMiddleware,
-  authMiddleware.isAdmin,*/
+  authMiddleware.loggedMiddleware,
+  authMiddleware.isAdmin,
   pupitreController.changeTissiture
 );
 router.patch(
