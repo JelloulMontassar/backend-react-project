@@ -12,7 +12,7 @@ module.exports.loggedMiddleware = (req, res, next) => {
           userId: userId,
           role: result.role,
         };
-        //console.log("req.auth set:", req.auth);
+        console.log("req.auth set:", req.auth);
         next();
       } else {
         res.status(404).json({ error: "user does not exist" });

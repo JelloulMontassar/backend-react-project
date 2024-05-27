@@ -608,7 +608,7 @@ const postCandidat = async (req, res) => {
 
   if (candidatExistant) {
     console.log("existe déja");
-    res.status(201).json({ success: true, isNew: false, message: "Un candidat avec cet email existe déjà" });
+    res.status(200).json({ success: true, isNew: false, message: "Un candidat avec cet email existe déjà" });
   } 
   else 
   {
@@ -636,7 +636,7 @@ const postCandidat = async (req, res) => {
 
     const candidatEnregistre = await nouveauCandidat.save();
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       data: candidatEnregistre,
       isNew: true

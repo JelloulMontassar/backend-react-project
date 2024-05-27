@@ -5,8 +5,8 @@ const oeuvresController = require("../controllers/oeuvres");
 
 router.get(
   "/statistiqueParOeuvre",
-  // authMiddleware.loggedMiddleware,
-  // authMiddleware.isAdmin,
+   authMiddleware.loggedMiddleware,
+   authMiddleware.isAdmin,
   oeuvresController.statistiqueParOeuvre
 );
 

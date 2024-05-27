@@ -125,10 +125,89 @@ const consulterStatut = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const consulterHistoriqueStatutChoriste = async (req, res) => {
+  try {
+      const userId = req.auth.userId;
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
+      }
+    const dateIntegrationUser = new Date(user.createdAt);
+    const saisonActuelle = await Saison.findOne().sort({ dateDebut: -1 });
+    const historiqueStatut = [];
+
+    const yearsSinceIntegration =
+      new Date().getFullYear() - dateIntegrationUser.getFullYear();
+
+    for (
+      let annee = dateIntegrationUser.getFullYear();
+      annee <= saisonActuelle.dateDebut.getFullYear();
+      annee++
+    ) {
+      const yearsSinceIntegration = annee - dateIntegrationUser.getFullYear();
+      let niveauExperience = "Inactif";
+
+      if (yearsSinceIntegration === 0) {
+        niveauExperience = "Choriste Junior";
+      } else if (yearsSinceIntegration === 1) {
+        niveauExperience = "Choriste";
+      } else if (yearsSinceIntegration >= 2) {
+        niveauExperience = "Senior";
+      }
+
+      if (
+        dateIntegrationUser.getFullYear() === 2018 &&
+        yearsSinceIntegration >= 0
+      ) {
+        niveauExperience = "Vétéran";
+      }
+
+      historiqueStatut.push({
+        dateDebut_année_de_la_saison: annee,
+        niveauExperience: niveauExperience,
+      });
+    }
+
+    // save db
+    const existingHistoriqueStatut = await HistoriqueStatut.findOne({
+      user: user._id,
+    });
+
+    if (existingHistoriqueStatut) {
+      existingHistoriqueStatut.yearsAndStatus = historiqueStatut;
+      await existingHistoriqueStatut.save();
+      res.status(200).json({
+        success: true,
+        message: `Historique - Statut du : ${user.nom} ${user.prenom}`,
+        data: existingHistoriqueStatut,user
+      });
+    } else {
+      await HistoriqueStatut.create({
+        user: user._id,
+        yearsAndStatus: historiqueStatut,
+      });
+      res.status(201).json({
+        success: true,
+        message: "HistoriqueStatut créé avec succès",
+        data: historiqueStatut,user
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Erreur lors de l'enregistrement de l'historique",
+    });
+  }
+};
 const consulterHistoriqueStatut = async (req, res) => {
   try {
+    
       const user = await User.findOne({ id_national : req.params.id });
-
+      console.log(user);
+      
       if (!user) {
         return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
       }
@@ -979,4 +1058,5 @@ module.exports = {
   getListeAbsenceRepetitions,
   statistiqueParChoriste,
   getAllChoriste,
+  consulterHistoriqueStatutChoriste
 };

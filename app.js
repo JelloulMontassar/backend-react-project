@@ -28,19 +28,16 @@ startScheduler();
 
 
 // "00 10 * * *"
-cron.schedule("00 10 * * *", async () => {
+cron.schedule("*/2 * * * *", async () => {
   console.log("Cron job started");
   try {
     const liste = await notifieradmin();
 
     if (liste) {
       io.emit("notif-659082e55ad0d1b3ddfbf909", {
-        message: "liste des candidatures",
+        message: "liste des candidatures 24h passé",
         liste,
       });
-    }
-    else{
-      console.log("no candidat !!")
     }
   } catch (error) {
     console.error("Error in cron job:", error);
