@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       enum: ["inactif", "actif"],
       default: "actif",
     },
+    statutConge: { type: String, enum: ["enposte", "enconge"], default: "enposte" },
     niveauExperience: {
       type: String,
       enum: ["junior", "senior", "veteran"],
@@ -76,6 +77,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+
 
 const User = mongoose.model("User", userSchema);
 

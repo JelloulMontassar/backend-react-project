@@ -6,25 +6,52 @@ const { io } = require("../socket");
 exports.create = async (req, res) => {
   try {
     const { userId } = req.auth;
+    const { dateDebut, dateFin } = req.body;
+
+    // Récupérer l'utilisateur
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Créer le congé
     const conge = new Conge({ ...req.body, createdBy: userId });
     const savedConge = await conge.save();
-    const user = await User.findById(userId);
-    console.log(user.conges);
-    user.conges = [...user.conges, savedConge._id];
-    user.save();
-    const admin = await User.findOne({role:"admin"})
+
+    // Vérifier si la date de début est aujourd'hui ou déjà passée
+    const today = new Date();
+    const startDate = new Date(dateDebut);
+    if (startDate <= today) {
+      // Si la date de début est aujourd'hui ou déjà passée, mettre le statut en congé
+      user.statutConge = "enconge";
+    }
+
+    // Mettre à jour le statut de l'utilisateur en fonction de la date de fin de congé
+    const endDate = new Date(dateFin);
+    if (endDate <= today) {
+      // Si la date de fin est déjà passée, mettre le statut en poste
+      user.statutConge = "enposte";
+    }
+
+    await user.save();
+
+    const admin = await User.findOne({ role: "admin" });
     io.emit(`notif-${admin._id.toString()}`, {
       message: `Le choriste ${user.nom} ${user.prenom} a demandé un congé.`,
     });
+
     res.status(201).json({
-      message: "Conge added succesfully !",
+      message: "Congé ajouté avec succès !",
       payload: savedConge,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error creating congé" });
+    res.status(500).json({ message: "Erreur lors de la création du congé", error });
   }
 };
+
+
+
 
 exports.getAll = async (req, res) => {
   try {
