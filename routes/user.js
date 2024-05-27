@@ -14,7 +14,7 @@ router.get("/getAllUserActivityHistory",
 router.get("/ActivityHistory",
  authMiddleware.loggedMiddleware, 
  authMiddleware.isChoriste, 
- requestValidator.validateGetUserActivityHistory, 
+//  requestValidator.validateGetUserActivityHistory, 
  authMiddleware.loggedMiddleware, 
  userController.getUserActivityHistory);
 
