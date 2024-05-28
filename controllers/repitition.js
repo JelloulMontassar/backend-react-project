@@ -175,24 +175,22 @@ const informerAbsence = async (req, res) => {
     const { userId } = req.auth;
     const { id } = req.params;
     const { raisonAbsence } = req.body;
+
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found !" });
     }
-
-    const repetitionUser = user.Repetitions.find(
+    console.log(user);
+    const repitionUser = user.Repetitions.find(
       (c) => c.repetition.toString() == id
     );
-
-    if (!repetitionUser) {
-      return res
-        .status(404)
-        .json({ message: "User has not this repetition !" });
+    console.log(repitionUser);
+    if (!repitionUser) {
+      return res.status(404).json({ message: "User has not this repition !" });
     }
 
-    repetitionUser.presence = false;
-    repetitionUser.raisonAbsence = raisonAbsence;
+    repitionUser.raisonAbsence = raisonAbsence;
 
     await user.save();
     res.status(200).json({ message: "Absence confirmed !", payload: user });
