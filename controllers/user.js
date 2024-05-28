@@ -424,6 +424,7 @@ const getListesChoristesDisponibles = async (req, res) => {
     let query = {
       role: "choriste",
       "Concerts.disponibilite": true,
+      "Concerts.Concert": idConcert,
     };
 
     if (pupitreFilter) {
@@ -439,23 +440,9 @@ const getListesChoristesDisponibles = async (req, res) => {
     }
 
     const choristes = await User.find(query);
+    console.log(choristes);
 
-    const choristesDisponibles = choristes
-      .filter((choriste) =>
-        choriste.Concerts.some(
-          (concert) =>
-            concert.Concert.toString() === idConcert &&
-            concert.disponibilite === true
-        )
-      )
-      .map(({ prenom, nom, telephone, email }) => ({
-        prenom,
-        nom,
-        telephone,
-        email,
-      }));
-
-    res.json({ choristes: choristesDisponibles });
+    res.json({ choristes: choristes });
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des choristes disponibles :",
@@ -779,7 +766,6 @@ const getAllUserActivityHistory = async (req, res) => {
   }
 };
 
-
 const getUserActivityHistory = async (req, res) => {
   try {
     const userId = req.auth.userId;
@@ -855,7 +841,6 @@ const getUserActivityHistory = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const placementConcert = async (req, res) => {
   try {

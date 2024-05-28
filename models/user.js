@@ -12,7 +12,11 @@ const userSchema = new mongoose.Schema(
       enum: ["inactif", "actif"],
       default: "actif",
     },
-    statutConge: { type: String, enum: ["enposte", "enconge"], default: "enposte" },
+    statutConge: {
+      type: String,
+      enum: ["enposte", "enconge"],
+      default: "enposte",
+    },
     niveauExperience: {
       type: String,
       enum: ["junior", "senior", "veteran"],
@@ -50,7 +54,7 @@ const userSchema = new mongoose.Schema(
         raisonAbsence: { type: String },
         presence: { type: Boolean, required: true, default: false },
         placement: { type: String },
-        disponibilite: { type: Boolean },
+        disponibilite: { type: Boolean, default: true },
       },
     ],
     Repetitions: [
@@ -63,6 +67,7 @@ const userSchema = new mongoose.Schema(
         raison: { type: String },
         presence: { type: Boolean, required: true, default: false },
         raisonAbsence: { type: String },
+        disponibilite: { type: Boolean, default: true },
       },
     ],
     conges: [
@@ -77,8 +82,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-
 
 const User = mongoose.model("User", userSchema);
 
