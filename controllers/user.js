@@ -128,12 +128,14 @@ const consulterStatut = async (req, res) => {
 
 const consulterHistoriqueStatutChoriste = async (req, res) => {
   try {
-      const userId = req.auth.userId;
-      const user = await User.findById(userId);
+    const userId = req.auth.userId;
+    const user = await User.findById(userId);
 
-      if (!user) {
-        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
-      }
+    if (!user) {
+      return res
+        .status(200)
+        .json({ success: false, error: "Choriste non trouvé ! " });
+    }
     const dateIntegrationUser = new Date(user.createdAt);
     const saisonActuelle = await Saison.findOne().sort({ dateDebut: -1 });
     const historiqueStatut = [];
@@ -181,7 +183,8 @@ const consulterHistoriqueStatutChoriste = async (req, res) => {
       res.status(200).json({
         success: true,
         message: `Historique - Statut du : ${user.nom} ${user.prenom}`,
-        data: existingHistoriqueStatut,user
+        data: existingHistoriqueStatut,
+        user,
       });
     } else {
       await HistoriqueStatut.create({
@@ -191,7 +194,8 @@ const consulterHistoriqueStatutChoriste = async (req, res) => {
       res.status(201).json({
         success: true,
         message: "HistoriqueStatut créé avec succès",
-        data: historiqueStatut,user
+        data: historiqueStatut,
+        user,
       });
     }
   } catch (error) {
@@ -204,14 +208,14 @@ const consulterHistoriqueStatutChoriste = async (req, res) => {
 };
 const consulterHistoriqueStatut = async (req, res) => {
   try {
-    
-      const user = await User.findOne({ id_national : req.params.id });
-      console.log(user);
-      
-      if (!user) {
-        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
-      }
+    const user = await User.findOne({ id_national: req.params.id });
+    console.log(user);
 
+    if (!user) {
+      return res
+        .status(200)
+        .json({ success: false, error: "Choriste non trouvé ! " });
+    }
 
     const dateIntegrationUser = new Date(user.createdAt);
     const saisonActuelle = await Saison.findOne().sort({ dateDebut: -1 });
@@ -260,7 +264,8 @@ const consulterHistoriqueStatut = async (req, res) => {
       res.status(200).json({
         success: true,
         message: `Historique - Statut du : ${user.nom} ${user.prenom}`,
-        data: existingHistoriqueStatut,user
+        data: existingHistoriqueStatut,
+        user,
       });
     } else {
       await HistoriqueStatut.create({
@@ -270,7 +275,8 @@ const consulterHistoriqueStatut = async (req, res) => {
       res.status(201).json({
         success: true,
         message: "HistoriqueStatut créé avec succès",
-        data: historiqueStatut,user
+        data: historiqueStatut,
+        user,
       });
     }
   } catch (error) {
@@ -939,12 +945,17 @@ const getListeAbsenceRepetitions = async (req, res) => {
 
 const statistiqueParChoriste = async (req, res) => {
   try {
-    const choristes = await User.find({ id_national: req.params.id , role: "choriste" });
-    if (! choristes){
-       console.log("000",choristes)
-        return res.status(200).json({ success: false, error: "Choriste non trouvé ! " });
+    const choristes = await User.find({
+      id_national: req.params.id,
+      role: "choriste",
+    });
+    if (!choristes) {
+      console.log("000", choristes);
+      return res
+        .status(200)
+        .json({ success: false, error: "Choriste non trouvé ! " });
     }
-    console.log("111",choristes)
+    console.log("111", choristes);
     const concerts = await Concert.find();
 
     const statistiquesChoristes = [];
@@ -1048,6 +1059,69 @@ const getStatutConge = async (req, res) => {
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
+const getOwnConcerts = async (req, res) => {
+  try {
+    const { userId } = req.auth;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: true, message: "User not found" });
+    }
+    const concertIds = user.Concerts.map((concert) => concert.Concert);
+    const concerts = await Concert.find({ _id: { $in: concertIds } }).populate(
+      "saison"
+    );
+
+    const traitedConcerts = concerts.map((concert) => {
+      let [rep] = user.Concerts.filter(
+        (r) => r.Concert.toString() === concert._id.toString()
+      );
+      rep = rep.toObject();
+      delete rep.Concert;
+      delete rep._id;
+      return { ...concert.toObject(), ...rep };
+    });
+
+    res.status(200).json({ success: true, payload: traitedConcerts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
+
+const getOwnRepititions = async (req, res) => {
+  try {
+    const { userId } = req.auth;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: true, message: "User not found" });
+    }
+    const repetitionIds = user.Repetitions.map(
+      (repetition) => repetition.repetition
+    );
+    console.log(user.Repetitions);
+    const repetitions = await Repetition.find({
+      _id: { $in: repetitionIds },
+    })
+      .select("-pupitres -participants")
+      .populate("concert", "nom");
+    const traitedRepetitions = repetitions.map((repetition) => {
+      let [rep] = user.Repetitions.filter(
+        (r) => r.repetition.toString() === repetition._id.toString()
+      );
+      rep = rep.toObject();
+      delete rep.repetition;
+      delete rep._id;
+      return { ...repetition.toObject(), ...rep };
+    });
+    console.log(traitedRepetitions);
+    res.status(200).json({ success: true, payload: traitedRepetitions });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Erreur serveur" });
+  }
+};
 
 module.exports = {
   getStatutConge,
@@ -1072,5 +1146,7 @@ module.exports = {
   getListeAbsenceRepetitions,
   statistiqueParChoriste,
   getAllChoriste,
-  consulterHistoriqueStatutChoriste
+  consulterHistoriqueStatutChoriste,
+  getOwnConcerts,
+  getOwnRepititions,
 };

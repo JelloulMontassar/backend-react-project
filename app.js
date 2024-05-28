@@ -96,11 +96,6 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
-// mongoose.connect('mongodb+srv://choeurproject:9Tjqpt0pwmNh5IOm@projetchoeur.oavbnbo.mongodb.net/?retryWrites=true&w=majority', {})
-//     .then(() => console.log("connexion à MongoDB réussi"))
-//     .catch((e) => console.log("connexion à MongoDB échouée", e));
-
-
 app.use(express.json());
 app.use("uploads", express.static("uploads"));
 app.use((req, res, next) => {

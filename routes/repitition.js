@@ -26,7 +26,7 @@ router.delete(
 );
 router.patch(
   "/informerAbsence/:id",
-//   authMiddleware.loggedMiddleware,
+  authMiddleware.loggedMiddleware,
 //   authMiddleware.isChoriste,
   repititionController.informerAbsence
 );

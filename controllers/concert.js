@@ -234,7 +234,6 @@ const excelFile = async (req, res, next) => {
   }
 };
 
-
 const convertExcelToJson = (path) => {
   const work = xlsx.readFile(path);
   const sheetname = work.SheetNames[0];
@@ -397,9 +396,9 @@ const informerAbsence = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found !" });
     }
-
+    console.log(user);
     const concertUser = user.Concerts.find((c) => c.Concert.toString() == id);
-
+    console.log(concertUser);
     if (!concertUser) {
       return res.status(404).json({ message: "User has not this concert !" });
     }
@@ -432,25 +431,33 @@ const getConcertsForActiveSeason = async (req, res, next) => {
     if (!activeSeasonId) {
       return res.status(404).json({ message: "Aucune saison active trouvée" });
     }
-    const concerts = await Concert.find({ saison: activeSeasonId }).populate("saison");
+    const concerts = await Concert.find({ saison: activeSeasonId }).populate(
+      "saison"
+    );
     if (concerts.length === 0) {
-    //   res.status(200).json({
-    //   message: "Pas de concerts pour cette saison",
-    //   concerts,
-    // });
+      //   res.status(200).json({
+      //   message: "Pas de concerts pour cette saison",
+      //   concerts,
+      // });
       //console.log("Pas de concerts dans cette saison");
     }
     res.status(200).json({
-      message: "L'affichage des Concerts de la saison active est effectué avec succès",
+      message:
+        "L'affichage des Concerts de la saison active est effectué avec succès",
       concerts,
     });
   } catch (error) {
-    console.error("Erreur lors de l'affichage des Concerts de la saison active:", error);
-    res.status(500).json({ message: "Erreur lors de l'affichage des Concerts de la saison active" });
+    console.error(
+      "Erreur lors de l'affichage des Concerts de la saison active:",
+      error
+    );
+    res
+      .status(500)
+      .json({
+        message: "Erreur lors de l'affichage des Concerts de la saison active",
+      });
   }
 };
-
-
 
 module.exports = {
   SaveSeuilconcert,
@@ -466,5 +473,5 @@ module.exports = {
   informerAbsence,
   getConcerts,
   getConcertsForActiveSeason,
-  findActiveSeasonId
+  findActiveSeasonId,
 };
