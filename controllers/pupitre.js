@@ -50,55 +50,68 @@ const getAll = async (req, res) => {
   }
 };
 const designer2Chefs = async (req, res) => {
-  try {
-    const { pupitreId, chef1Id, chef2Id } = req.body;
+  const { pupitreId, chef1Id, chef2Id } = req.body;
 
-    const updatedPupitre = await Pupitre.findByIdAndUpdate(
-      pupitreId,
-      { $addToSet: { chef_pupitre: [chef1Id, chef2Id] } },
-      { new: true }
+  if (!chef1Id || !chef2Id) {
+    return res
+      .status(400)
+      .json({ message: "Both chef1Id and chef2Id are required" });
+  }
+
+  try {
+    const pupitre = await Pupitre.findById(pupitreId)
+      .populate("membres chef_pupitre");
+    if (!pupitre) {
+      return res.status(404).json({ message: "Pupitre not found" });
+    }
+
+    // Demote old chefs to members
+    const oldChefs = pupitre.chef_pupitre;
+    for (let oldChefId of oldChefs) {
+      const oldChef = await User.findById(oldChefId);
+      if (oldChef) {
+        oldChef.role = "choriste";
+        await oldChef.save();
+        pupitre.membres.push(oldChefId);
+      }
+    }
+
+    pupitre.chef_pupitre = [];
+
+    const isChef1Member = pupitre.membres.some((member) =>
+      member._id.equals(chef1Id)
+    );
+    const isChef2Member = pupitre.membres.some((member) =>
+      member._id.equals(chef2Id)
+    );
+    if (!isChef1Member || !isChef2Member) {
+      return res.status(400).json({
+        message: "Both users must be members of the pupitre to be chefs",
+      });
+    }
+
+    const chef1 = await User.findById(chef1Id);
+    const chef2 = await User.findById(chef2Id);
+    if (!chef1 || !chef2) {
+      return res.status(404).json({ message: "One or both users not found" });
+    }
+    chef1.role = "chef de pupitre";
+    chef2.role = "chef de pupitre";
+    await chef1.save();
+    await chef2.save();
+
+    // Add new chefs to chef_pupitre and remove them from membres
+    pupitre.chef_pupitre.push(chef1Id, chef2Id);
+    pupitre.membres = pupitre.membres.filter(
+      (member) => !member._id.equals(chef1Id) && !member._id.equals(chef2Id)
     );
 
-    if (!updatedPupitre) {
-      return res.status(404).json({ error: "Pupitre non trouvé." });
-    }
+    await pupitre.save();
 
-    const user1Exists = await User.exists({ _id: chef1Id });
-    const user2Exists = await User.exists({ _id: chef2Id });
-
-    if (!user1Exists && !user2Exists) {
-      return res
-        .status(404)
-        .json({ error: "Les deux ID d'utilisateurs n'existent pas." });
-    } else if (!user1Exists) {
-      return res.status(404).json({
-        error: "ID d'utilisateur pour chef de pupitre 1 n'existe pas.",
-      });
-    } else if (!user2Exists) {
-      return res.status(404).json({
-        error: "ID d'utilisateur pour chef de pupitre 2 n'existe pas.",
-      });
-    } else {
-      // màj role chef 1
-      await User.findByIdAndUpdate(
-        chef1Id,
-        { $set: { role: "chef de pupitre" } },
-        { new: true }
-      );
-
-      // màj role chef 2
-      await User.findByIdAndUpdate(
-        chef2Id,
-        { $set: { role: "chef de pupitre" } },
-        { new: true }
-      );
-
-      return res
-        .status(200)
-        .json({ message: "Pupitre mis à jour avec succès" });
-    }
+    res.status(200).json({ message: "Chefs assigned successfully", pupitre });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Error assigning chefs:", error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 const getListeChoristesPresProgRep = async (req, res) => {
@@ -266,5 +279,5 @@ module.exports = {
   defineNeeds,
   designer2Chefs,
   changeTissiture,
-  getAll
+  getAll,
 };
