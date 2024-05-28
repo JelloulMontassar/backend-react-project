@@ -135,9 +135,9 @@ const deleteConcert = async (req, res, next) => {
       return res.status(404).json({ message: "Concert non trouvée" });
     }
     const choristes = await User.find({ role: "choriste" });
+    await Repetition.deleteMany({ concert: concertId });
 
     for (const choriste of choristes) {
-      // Utiliser $pull pour retirer l'ID du concert de la liste Concerts
       await User.updateOne(
         { _id: choriste._id },
         { $pull: { Concerts: { Concert: concertId } } }
@@ -403,7 +403,7 @@ const informerAbsence = async (req, res) => {
       return res.status(404).json({ message: "User has not this concert !" });
     }
 
-    concertUser.presence = false;
+    concertUser.disponibilite = false;
     concertUser.raisonAbsence = raisonAbsence;
 
     await user.save();
@@ -451,11 +451,9 @@ const getConcertsForActiveSeason = async (req, res, next) => {
       "Erreur lors de l'affichage des Concerts de la saison active:",
       error
     );
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de l'affichage des Concerts de la saison active",
-      });
+    res.status(500).json({
+      message: "Erreur lors de l'affichage des Concerts de la saison active",
+    });
   }
 };
 

@@ -189,7 +189,7 @@ const informerAbsence = async (req, res) => {
     if (!repitionUser) {
       return res.status(404).json({ message: "User has not this repition !" });
     }
-
+    repitionUser.disponibilite = false;
     repitionUser.raisonAbsence = raisonAbsence;
 
     await user.save();
