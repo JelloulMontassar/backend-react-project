@@ -451,6 +451,47 @@ const getListesChoristesDisponibles = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
+const getListesChoristesDisponibles2 = async (req, res) => {
+  try {
+    const idConcert = req.params.id;
+    const pupitreFilter = req.query.pupitre;
+
+    const concert = await Concert.findById(idConcert);
+
+    if (!concert) {
+      return res.status(404).json({ error: "Concert non trouvé" });
+    }
+
+    let query = {
+      role: "choriste",
+      "Concerts.disponibilite": true,
+      "Concerts.Concert": idConcert,
+    };
+
+    if (pupitreFilter) {
+      const pupitre = await Pupitre.findOne({ type_voix: pupitreFilter });
+      if (pupitre) {
+        const membresPupitreIds = pupitre.membres.map((member) =>
+            member.toString()
+        );
+        query._id = { $in: membresPupitreIds };
+      } else {
+        return res.status(404).json({ error: "Pupitre non trouvé" });
+      }
+    }
+
+    const choristes = await User.find(query).sort({ "Concerts.disponibilite": -1, nb_absence_total: 1 });
+    console.log(choristes);
+
+    res.json({ choristes: choristes });
+  } catch (error) {
+    console.error(
+        "Erreur lors de la récupération des choristes disponibles :",
+        error
+    );
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
 
 const getListeAbsenceChoriste = async (req, res) => {
   try {
@@ -1213,4 +1254,5 @@ module.exports = {
   consulterHistoriqueStatutChoriste,
   getOwnConcerts,
   getOwnRepititions,
+  getListesChoristesDisponibles2
 };

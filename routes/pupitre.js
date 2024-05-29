@@ -28,7 +28,7 @@ router.get(
   authMiddleware.loggedMiddleware,
   pupitreController.getListeChoristesPresProgRep
 );
-router.get(
+router.post(
   "/getusersseuilpres/:id",
   authMiddleware.loggedMiddleware,
   pupitreController.getChoristesseuilpres

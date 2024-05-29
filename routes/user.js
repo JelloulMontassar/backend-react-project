@@ -39,6 +39,8 @@ router.get("/consulterProfil/:id", authMiddleware.loggedMiddleware, authMiddlewa
 router.patch("/indiquerDisponibilite/:id", authMiddleware.loggedMiddleware, authMiddleware.isChoriste, requestValidator.validateIndiquerDisponibilite, userController.indiquerDisponibilite);
 router.get("/consulterListesChoristesDisponibles/:id", /*authMiddleware.loggedMiddleware,authMiddleware.isAdmin,requestValidator.validateGetListesChoristesDisponibles, */
     userController.getListesChoristesDisponibles);
+router.get("/consulterListesChoristesDisponiblesP/:id", /*authMiddleware.loggedMiddleware,authMiddleware.isAdmin,requestValidator.validateGetListesChoristesDisponibles, */
+    userController.getListesChoristesDisponibles2);
 router.get("/listeabsencechoriste/:authUserId/:choristeId", authMiddleware.loggedMiddleware, authMiddleware.isAdmin, userController.getListeAbsenceChoriste);
 router.post("/eliminerChoristeDicipline/:id", authMiddleware.loggedMiddleware, authMiddleware.isAdmin, userController.eliminerChoristeDicipline)
 
